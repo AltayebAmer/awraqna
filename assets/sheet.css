@@ -44,7 +44,9 @@
 .vform .op-line i{font-style:normal}
 .vform .rule{display:block;border-top:2px solid #111;margin-top:3px}
 /* مستطيل الإجابة: مكان صريح للحل بدل فراغ مفتوح يختلط بالسؤال التالي. */
-.vform .ansbox{display:block;height:30px;border:1px solid #b8b8b8;border-radius:4px;
+/* صنف مستقل لا وصفي: قُيّد سابقاً بـ .vform فاختفت صناديق الإجابة
+   في كل مجال جديد لا يستخدم الصيغة العمودية (الساعة، البرمجة، العلوم). */
+.ansbox{display:block;height:30px;border:1px solid #b8b8b8;border-radius:4px;
   margin-top:5px;background:#fcfcfc}
 
 /* ---------- أسئلة سطرية: المقارنة والأنماط ---------- */
@@ -52,9 +54,9 @@
   font-family:'SF Mono',Menlo,Consolas,monospace;font-size:17px;font-weight:700;
   direction:ltr;text-align:left;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
   line-height:1.15}
-.vform .ansbox.inline,.inline-q .ansbox{display:inline-block;height:26px;min-width:52px;
+.ansbox.inline{display:inline-block;height:26px;min-width:52px;
   vertical-align:middle;margin-top:0}
-.inline-q .ansbox.sm{min-width:38px}
+.ansbox.sm{min-width:38px}
 /* الأنماط تحتاج عرضاً أكبر ⇒ عمودان بدل أربعة. */
 .q-grid.wide{grid-template-columns:repeat(2,1fr)}
 
@@ -123,6 +125,39 @@
 .cl-big{font-size:calc(130mm * var(--fs,1));line-height:1.2;color:#fbfbfb;-webkit-text-stroke:1.4px #111}
 .cl-name{font-size:22px;font-weight:800;color:#333;margin-top:6px}
 
+/* ---------- البرمجة والعلوم والوقت ---------- */
+.cd-line{flex:1;min-width:0;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:14px;
+  font-weight:700;direction:ltr;text-align:left;display:flex;align-items:center;gap:6px;
+  flex-wrap:wrap;line-height:1.2}
+.cd-arrow{color:#666;font-weight:400}
+.cd-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cd-card{position:relative;break-inside:avoid;page-break-inside:avoid;border:1px solid #ddd;
+  border-radius:8px;padding:10px 10px 8px;min-width:0}
+.cd-card .q-num{position:absolute;top:6px;inset-inline-start:6px}
+.cd-code{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11.5px;line-height:1.45;
+  background:#f6f6f6;border-radius:5px;padding:7px 8px;margin:14px 0 8px;white-space:pre;
+  overflow:hidden;color:#111;direction:rtl;text-align:start}
+.cd-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.cd-tbl th,.cd-tbl td{border:1px solid #ccc;padding:3px 5px;text-align:center;height:19px}
+.cd-tbl th{background:#f2f2f2;font-weight:800;font-size:11px}
+.cd-grid{display:block;width:100%;max-width:120px;height:auto;margin:14px auto 6px}
+.cd-seq{font-size:15px;letter-spacing:4px;text-align:center;direction:ltr;color:#111}
+.cd-ask{font-family:'SF Mono',Menlo,monospace;font-size:13px;text-align:center;color:#333;margin-top:5px}
+.sc-coord{display:flex;flex-direction:column;align-items:center;gap:12px}
+.sc-axes{display:block;width:100%;max-width:150mm;height:auto}
+.sc-pts{width:100%}
+.tm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tm-item{position:relative;break-inside:avoid;page-break-inside:avoid;text-align:center;min-width:0}
+.tm-item .q-num{position:absolute;top:0;inset-inline-start:0}
+.tm-clock{display:block;width:100%;max-width:52mm;height:auto;margin:0 auto}
+.tm-ans{margin-top:5px}
+.tm-cal{display:flex;justify-content:center}
+.cal{border-collapse:collapse;width:100%;table-layout:fixed}
+.cal caption{font-size:19px;font-weight:900;padding-bottom:9px;color:#111}
+.cal th{border:1px solid #999;background:#f2f2f2;font-size:12px;font-weight:800;padding:5px 2px}
+.cal td{border:1px solid #999;height:31mm;vertical-align:top;padding:3px}
+.cal-n{font-size:12px;font-weight:700;color:#444}
+
 /* ---------- الموبايل ---------- */
 @media (max-width:640px){
   .ctl-label{flex-basis:100%}
@@ -136,6 +171,10 @@
   .tr-model,.tr-ghost{font-size:calc(26px * var(--fs,1))}
   .cl-big{font-size:calc(56vw * var(--fs,1))}
   .a-grid{grid-template-columns:repeat(3,1fr)}
+  .cd-grid-3,.tm-grid{grid-template-columns:repeat(2,1fr)}
+  .cal td{height:16mm}
+  .cal caption{font-size:16px}
+  .cd-line{font-size:13px}
   .vform{font-size:16px}
 }
 
@@ -160,9 +199,9 @@
   .q-num{background:none;border:1px solid #999;color:#000}
   .vform{font-size:15px}
   .vform .rule{border-top-color:#000}
-  .vform .ansbox{height:30px;border-color:#9a9a9a;background:none}
+  .ansbox{height:30px;border-color:#9a9a9a;background:none}
   .inline-q{font-size:15px}
-  .inline-q .ansbox{height:24px;border-color:#9a9a9a;background:none}
+  .ansbox.inline{height:24px}
   .q-item{padding-bottom:8px;border-bottom-color:#d0d0d0}
   .sheet-head{border-bottom-color:#000}
   .a-grid div{border-bottom-color:#bbb}
@@ -175,4 +214,18 @@
   .art-svg{max-height:236mm}
   .lt-block{border-color:#ccc}
   .cl-wrap{min-height:210mm}
+  .cd-code{background:none;border:1px solid #ddd}
+  .cd-tbl th{background:none}
+  .cal th{background:none}
+  .sc-axes{max-width:150mm}
+  .tm-clock{max-width:50mm}
+}
+
+/* شاشات ضيّقة جداً: ٣ أعمدة في صفحة الإجابات تقصّ إجابات مثل «1101₂».
+   الطباعة غير متأثرة (عرض A4 ثابت) لكن القراءة على الجوال كانت تفقد محتوى. */
+@media (max-width:420px){
+  .a-grid{grid-template-columns:repeat(2,1fr);font-size:12px}
+  .a-grid div{overflow-wrap:anywhere}
+  .cd-grid-3,.tm-grid{grid-template-columns:1fr}
+  .q-grid.wide{grid-template-columns:1fr}
 }
