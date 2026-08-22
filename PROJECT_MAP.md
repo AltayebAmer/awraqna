@@ -58,11 +58,12 @@ awraqna/
 │   ├── sheet.css       ★ الورقة + @media print — الطبقة المطبوعة الوحيدة
 │   ├── generators.js   ★ منطق رياضي نقي — ممنوع DOM
 │   ├── app.js          state · render · i18n · print
-├── ../.claude/launch.json   إعداد خادم التطوير المحلي (خارج مجلد المشروع)
-│   └── ads.js          منسوخ من 007 كما هو + awraqna في HOUSE[]
+│   └── ads.js          منسوخ من 007 + إعلان بيتي متبادل مع 007.gallery
 ├── .gitignore
 ├── CLAUDE.md
 └── PROJECT_MAP.md
+
+../.claude/launch.json   إعداد خادم التطوير المحلي (خارج مجلد المشروع، لا يُنشر)
 ```
 
 ### قرارات محسومة — لا يُعاد فتحها
