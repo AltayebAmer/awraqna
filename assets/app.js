@@ -31,7 +31,7 @@
       { v: "med",  ar: "متوسط", en: "Medium" },
       { v: "hard", ar: "صعب",   en: "Hard" }
     ],
-    count: [10, 20, 30].map(function (n) { return { v: n, ar: n + " سؤال", en: n + " questions" }; })
+    count: [10, 20, 30, 40].map(function (n) { return { v: n, ar: n + " سؤال", en: n + " questions" }; })
   };
   var TITLES = {
     add: { ar: "أوراق عمل — الجمع", en: "Worksheet — Addition" },
@@ -41,7 +41,7 @@
   var DIFF_LBL = { easy: { ar: "سهل", en: "Easy" }, med: { ar: "متوسط", en: "Medium" }, hard: { ar: "صعب", en: "Hard" } };
 
   /* ── الحالة: مصدر الحقيقة الوحيد ────────────────────────── */
-  var state = { grade: 3, skill: "add", difficulty: "med", count: 20,
+  var state = { grade: 3, skill: "add", difficulty: "med", count: 40,
                 seed: Math.floor(Math.random() * 1e6) + 1, withAnswers: true };
   var questions = [];
 
@@ -107,7 +107,7 @@
       return '<div class="q-item"><span class="q-num">' + (i + 1) + '</span>' +
              '<span class="vform"><b>' + q.a + '</b>' +
              '<span class="op-line"><i>' + q.op + '</i><b>' + q.b + '</b></span>' +
-             '<span class="rule"></span></span></div>';
+             '<span class="rule"></span><span class="ansbox"></span></span></div>';
     }).join("");
     $("sheet").innerHTML = sheetHead(false) + '<div class="q-grid">' + html + '</div>';
   }

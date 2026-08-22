@@ -32,16 +32,20 @@
 .sheet-fields span{border-bottom:1px dotted #777;padding-bottom:2px;min-width:120px}
 
 .q-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 18px}
-.q-item{break-inside:avoid;page-break-inside:avoid;display:flex;gap:8px;align-items:flex-start}
+.q-item{break-inside:avoid;page-break-inside:avoid;display:flex;gap:8px;align-items:flex-start;
+  padding-bottom:11px;border-bottom:1px solid #e2e2e2}
 .q-num{flex:none;width:22px;height:22px;border-radius:50%;background:#eee;color:#333;
   font-size:11px;font-weight:800;display:grid;place-items:center;margin-top:2px}
 .vform{flex:0 0 auto;width:fit-content;min-width:62px;font-variant-numeric:tabular-nums;
   font-family:'SF Mono',Menlo,Consolas,monospace;font-size:18px;font-weight:700;
-  direction:ltr;text-align:right}
+  direction:ltr;text-align:right;line-height:1.15}
 .vform b{display:block;font-weight:700}
 .vform .op-line{display:flex;justify-content:space-between;gap:14px}
 .vform .op-line i{font-style:normal}
-.vform .rule{display:block;border-top:2px solid #111;margin-top:3px;height:26px}
+.vform .rule{display:block;border-top:2px solid #111;margin-top:3px}
+/* مستطيل الإجابة: مكان صريح للحل بدل فراغ مفتوح يختلط بالسؤال التالي. */
+.vform .ansbox{display:block;height:30px;border:1px solid #b8b8b8;border-radius:4px;
+  margin-top:5px;background:#fcfcfc}
 
 .a-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px 14px;
   font-family:'SF Mono',Menlo,Consolas,monospace;font-size:14px;font-weight:700;direction:ltr;text-align:left}
@@ -74,11 +78,13 @@
   #answers{break-before:page;page-break-before:always}
   /* آخر عنصر بلا هامش سفلي — السبب الأول للصفحة الفارغة الزائدة. */
   #print-root>.sheet:last-child{margin-bottom:0!important;padding-bottom:0!important}
-  .q-grid{gap:11px 16px}
+  .q-grid{gap:9px 16px}
   .q-item{break-inside:avoid;page-break-inside:avoid}
   .q-num{background:none;border:1px solid #999;color:#000}
-  .vform{font-size:16px}
-  .vform .rule{height:22px;border-top-color:#000}
+  .vform{font-size:15px}
+  .vform .rule{border-top-color:#000}
+  .vform .ansbox{height:30px;border-color:#9a9a9a;background:none}
+  .q-item{padding-bottom:8px;border-bottom-color:#d0d0d0}
   .sheet-head{border-bottom-color:#000}
   .a-grid div{border-bottom-color:#bbb}
 }

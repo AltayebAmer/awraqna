@@ -103,7 +103,7 @@
 
     var grade = Math.min(6, Math.max(1, parseInt(opts.grade, 10) || 3));
     var diff  = DIFFS[opts.difficulty] ? opts.difficulty : "med";
-    var count = Math.min(30, Math.max(1, parseInt(opts.count, 10) || 20));
+    var count = Math.min(40, Math.max(1, parseInt(opts.count, 10) || 20));
     var rng   = mulberry32(parseInt(opts.seed, 10) || 1);
 
     var out = [], seen = Object.create(null);
