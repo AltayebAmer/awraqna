@@ -75,6 +75,37 @@
 .puz-grid[data-per="2"] .puz-svg,.puz-grid[data-per="4"] .puz-svg{max-height:118mm}
 .paper{display:block;width:100%;height:auto}
 
+/* ---------- الفنون ---------- */
+.art-wrap{display:flex;justify-content:center}
+.art-svg{display:block;width:100%;max-width:186mm;height:auto;max-height:242mm}
+
+/* ---------- الحروف واللغات ----------
+   الحرف المجوَّف = تعبئة رمادية فاتحة + حدّ نصّي.
+   التعبئة ليست زينة: لو لم يدعم المتصفح -webkit-text-stroke
+   يبقى الحرف مرئياً قابلاً للتتبّع بدل أن يختفي تماماً. */
+.lt-grid{display:grid;gap:14px}
+.lt-grid[data-per="4"]{grid-template-columns:repeat(2,1fr)}
+.lt-block{break-inside:avoid;page-break-inside:avoid;border:1px solid #ddd;
+  border-radius:8px;padding:10px 12px;min-width:0}
+.lt-head{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #eee;
+  padding-bottom:6px;margin-bottom:8px}
+.lt-big{font-size:44px;line-height:1;font-weight:700;color:#111}
+.lt-name{font-size:14px;font-weight:700;color:#666}
+.lt-forms{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.lt-form{flex:1 1 60px;text-align:center;border:1px dashed #ccc;border-radius:6px;padding:5px 3px;min-width:0}
+.lt-fchar{display:block;font-size:26px;line-height:1.25;color:#111}
+.lt-flabel{display:block;font-size:10px;color:#777;margin-top:2px}
+.tr-rows{display:flex;flex-direction:column;gap:7px}
+.tr-row{display:flex;align-items:flex-end;gap:6px;border-bottom:1px dashed #c9c9c9;
+  padding-bottom:3px;overflow:hidden}
+.tr-model,.tr-ghost{font-size:34px;line-height:1.18;flex:none}
+.tr-model{color:#111;font-weight:700}
+.tr-ghost{color:#e0e0e0;-webkit-text-stroke:0.7px #b4b4b4}
+.cl-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:200mm;text-align:center}
+.cl-big{font-size:150mm;line-height:1;color:#fbfbfb;-webkit-text-stroke:1.4px #111}
+.cl-name{font-size:22px;font-weight:800;color:#333;margin-top:6px}
+
 /* ---------- الموبايل ---------- */
 @media (max-width:640px){
   .ctl-label{flex-basis:100%}
@@ -83,6 +114,10 @@
   .q-grid{grid-template-columns:repeat(2,1fr)}
   .q-grid.wide{grid-template-columns:1fr}
   .inline-q{font-size:15px}
+  .lt-grid[data-per="4"]{grid-template-columns:1fr}
+  .lt-big{font-size:34px}
+  .tr-model,.tr-ghost{font-size:26px}
+  .cl-big{font-size:56vw}
   .a-grid{grid-template-columns:repeat(3,1fr)}
   .vform{font-size:16px}
 }
@@ -118,4 +153,9 @@
   .paper{width:186mm;height:auto}
   .puz-grid{gap:12px}
   .puz-n{background:none;border:1px solid #999;color:#000}
+  /* الشكل مربّع فلا يملأ ارتفاع A4 — يُتوسَّط رأسياً فيبدو مقصوداً لا ناقصاً. */
+  .art-wrap{min-height:236mm;align-items:center}
+  .art-svg{max-height:236mm}
+  .lt-block{border-color:#ccc}
+  .cl-wrap{min-height:210mm}
 }
