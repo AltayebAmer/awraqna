@@ -13,6 +13,12 @@
 
   /* ── إعلاناتك البيتية — عدّل هنا فقط ─────────────────────── */
   const HOUSE = [
+    { id:"gallery", url:"https://007.gallery", badge:"٠٠٧ جاليري",
+      title_ar:"٠٠٧ جاليري — أدوات صور مجانية", title_en:"007.gallery — Free Image Tools",
+      body_ar:"إزالة خلفية، تكبير، ضغط، QR — كلها داخل متصفحك.",
+      body_en:"Background removal, upscaling, compression, QR — all in your browser.",
+      cta_ar:"جرّب الأدوات", cta_en:"Try the tools",
+      c1:"#14101f", c2:"#2e2350", accent:"#d4af37" },
     { id:"midad", url:"https://midad.gallery", badge:"مِداد",
       title_ar:"مِداد — فن الخط العربي", title_en:"Midad — Arabic Calligraphy",
       body_ar:"استكشف روائع الخط العربي بلمسة رقمية عصرية.",
