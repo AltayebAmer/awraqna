@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>أوراقنا — مولّد أوراق عمل رياضيات للطباعة</title>
+<meta name="description" content="ولّد أوراق عمل رياضيات (جمع، طرح، ضرب) قابلة للطباعة مجاناً، بأسئلة عشوائية وصفحة إجابات منفصلة. يعمل كلياً في متصفحك.">
+<link rel="canonical" href="https://awraqna.com/">
+<meta property="og:title" content="أوراقنا — مولّد أوراق عمل رياضيات للطباعة">
+<meta property="og:description" content="أوراق عمل رياضيات جاهزة للطباعة، مجاناً وبلا تسجيل.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/brand.css">
+<link rel="stylesheet" href="assets/sheet.css">
+<style>
+  /* مبدّل اللغة — نفس نمط 007: سمتان وقاعدتا CSS، بلا مكتبة i18n. */
+  [data-en]{display:none}
+  html[lang=en] [data-ar]{display:none}
+  html[lang=en] [data-en]{display:inline}
+  html[lang=en] .blk[data-en]{display:block}
+  .blk[data-ar]{display:block}
+  .hero{text-align:center;padding:26px 0 4px}
+  .hero h1{font-size:clamp(24px,5vw,34px);font-weight:900;letter-spacing:.2px}
+  .hero p{color:var(--txt-dim);margin-top:8px;font-size:15px}
+  .site-footer{border-top:1px solid var(--line);margin-top:34px;padding:22px 0;
+    color:var(--txt-mute);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="./"><span class="logo">أ</span>
+      <span data-ar>أوراق<b>نا</b></span><span data-en>Awraq<b>na</b></span></a>
+    <div class="nav-actions">
+      <button class="btn btn-lang" id="langBtn" type="button">EN</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1><span data-ar>مولّد أوراق عمل الرياضيات</span><span data-en>Math Worksheet Generator</span></h1>
+    <p><span class="blk" data-ar>اختر، اطبع، وزّع. أسئلة جديدة في كل مرة — مجاناً وبلا تسجيل.</span>
+       <span class="blk" data-en>Pick, print, hand out. Fresh questions every time — free, no sign-up.</span></p>
+  </section>
+
+  <section class="controls" aria-label="إعدادات الورقة">
+    <div class="ctl-row">
+      <div class="ctl-label"><span data-ar>الصف</span><span data-en>Grade</span></div>
+      <div class="chips" id="gradeChips" role="group"></div>
+    </div>
+    <div class="ctl-row">
+      <div class="ctl-label"><span data-ar>المهارة</span><span data-en>Skill</span></div>
+      <div class="chips" id="skillChips" role="group"></div>
+    </div>
+    <div class="ctl-row">
+      <div class="ctl-label"><span data-ar>الصعوبة</span><span data-en>Difficulty</span></div>
+      <div class="chips" id="diffChips" role="group"></div>
+    </div>
+    <div class="ctl-row">
+      <div class="ctl-label"><span data-ar>عدد الأسئلة</span><span data-en>Questions</span></div>
+      <div class="chips" id="countChips" role="group"></div>
+    </div>
+    <div class="ctl-row">
+      <div class="ctl-label"><span data-ar>الإجابات</span><span data-en>Answers</span></div>
+      <div class="chips">
+        <button class="chip" type="button" id="ansToggle" aria-pressed="true">
+          <span data-ar>اطبع صفحة الإجابات</span><span data-en>Print answer key</span></button>
+      </div>
+    </div>
+
+    <div class="ctl-actions">
+      <button class="btn btn-primary" type="button" id="printBtn">
+        <span data-ar>🖨️ اطبع الورقة</span><span data-en>🖨️ Print worksheet</span></button>
+      <button class="btn" type="button" id="regenBtn">
+        <span data-ar>🔄 إعادة توليد</span><span data-en>🔄 Regenerate</span></button>
+    </div>
+    <div class="seed-note" id="seedNote"></div>
+  </section>
+
+  <div data-ad-slot="rectangle"></div>
+</main>
+
+<!-- كل ما يُطبع بالداخل. كل ما بالخارج يختفي تلقائياً (sheet.css). -->
+<div id="print-root">
+  <article class="sheet" id="sheet"></article>
+  <article class="sheet" id="answers"></article>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span data-ar>أوراقنا · يعمل كلياً في متصفحك — لا يُرفع شيء إلى أي خادم.</span>
+    <span data-en>Awraqna · Runs entirely in your browser — nothing is uploaded.</span>
+  </div>
+</footer>
+
+<script src="assets/generators.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/ads.js" defer></script>
+</body>
+</html>
