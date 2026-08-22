@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="أوراقنا">
+  <!-- ورقة عمل: مربع ذهبي + صفحة بيضاء بثلاثة أسطر — يُقرأ عند 16px. -->
+  <rect width="64" height="64" rx="14" fill="#0a0b0f"/>
+  <rect x="12" y="8" width="40" height="48" rx="5" fill="#f2d16b"/>
+  <rect x="19" y="18" width="26" height="5" rx="2.5" fill="#0a0b0f"/>
+  <rect x="19" y="29" width="26" height="5" rx="2.5" fill="#0a0b0f"/>
+  <rect x="19" y="40" width="15" height="5" rx="2.5" fill="#0a0b0f"/>
+</svg>

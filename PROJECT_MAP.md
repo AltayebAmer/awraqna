@@ -18,6 +18,7 @@
 | اختبار | `node -e` على `generators.js` | node ≥ 18 (النظام) | غير مُضمَّن في المشروع، للتطوير فقط |
 | خادم محلي | `python3 -m http.server` | مثبّت مع macOS | تطوير فقط |
 | الاستضافة | Cloudflare Pages | — | النطاق مُشترى من Cloudflare Registrar |
+| الأيقونات | SVG → PNG عبر Chrome headless | — | لا مكتبة صور؛ `favicon.svg` هو المصدر |
 
 **أسرار:** لا يوجد أي سر في المشروع ⇒ لا `.env`. `.gitignore` موجود من البداية.
 
@@ -53,6 +54,11 @@ questions[] = [{ a, op, b, answer }]   ← مصدر الحقيقة الوحيد
 ```
 awraqna/
 ├── index.html          الواجهة + الورقة + صفحة الإجابات
+├── robots.txt          يسمح بالكل + يشير إلى sitemap
+├── sitemap.xml         رابط واحد (الموقع صفحة واحدة)
+├── favicon.ico         ٣ مقاسات (16/32/48) بصيغة PNG داخل ICO
+├── favicon.svg         المصدر — أي مقاس لاحق يُشتق منه
+├── apple-touch-icon.png 180×180 لشاشة iOS الرئيسية
 ├── assets/
 │   ├── brand.css       نظام تصميم 007 (منسوخ) — الشاشة فقط
 │   ├── sheet.css       ★ الورقة + @media print — الطبقة المطبوعة الوحيدة
