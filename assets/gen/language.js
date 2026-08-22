@@ -60,14 +60,20 @@
     return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; });
   };
 
-  /* صف تتبّع: أول حرف غامق كنموذج، والبقية مجوَّفة. */
-  function traceRow(ch, reps) {
+  /* صف تتبّع: نموذج غامق واحد، ثم السطر **كاملاً** حروفاً شفافة.
+     العدد مبالغ فيه عمداً و`overflow:hidden` يقصّ الزائد — لأن عدد
+     الحروف التي تسع السطر يتغيّر بتغيّر الخط وحجمه ولغة الصفحة،
+     وحسابه مسبقاً يترك فراغاً في نهاية السطر مع أي خط آخر. */
+  /* 80 مبالغة مقصودة: عرض السطر يتغيّر بالشاشة والخط وحجمه،
+     وأي رقم محسوب مسبقاً يترك فراغاً على عرض آخر. `overflow:hidden` يقصّ. */
+  var ROW_FILL = 80;
+  function traceRow(ch) {
     var out = ['<span class="tr-model">' + esc(ch) + "</span>"];
-    for (var i = 1; i < reps; i++) out.push('<span class="tr-ghost">' + esc(ch) + "</span>");
+    for (var i = 1; i < ROW_FILL; i++) out.push('<span class="tr-ghost">' + esc(ch) + "</span>");
     return '<div class="tr-row">' + out.join("") + "</div>";
   }
 
-  function letterBlock(ch, script, reps, showForms, rows) {
+  function letterBlock(ch, script, showForms, rows) {
     var head = '<div class="lt-head"><span class="lt-big">' + esc(ch) + "</span>";
     if (script === "ar" && NAMES[ch]) head += '<span class="lt-name">' + esc(NAMES[ch]) + "</span>";
     head += "</div>";
@@ -80,9 +86,23 @@
       }).join("") + "</div>";
     }
     var body = "";
-    for (var i = 0; i < rows; i++) body += traceRow(ch, reps);
+    for (var i = 0; i < rows; i++) body += traceRow(ch);
     return '<div class="lt-block">' + head + f + '<div class="tr-rows">' + body + "</div></div>";
   }
+
+  /* الخطوط: أسماء عائلات موجودة على macOS/iOS، وكل واحدة تنتهي باحتياط.
+     على ويندوز/أندرويد يسقط الاختيار إلى الاحتياط ⇒ الشكل يبقى صحيحاً
+     لكن ليس بقواعد الخط المطلوب. الحل الجذري ملفات خطوط محلية (انظر ROADMAP). */
+  /* الرقعة غائبة عمداً: العائلة الوحيدة المتاحة على النظام ملوّنة
+     (Aref Ruqaa Ink) ولا تصلح لورقة تتبّع، و`font-palette` لا يحوّلها
+     لأنها تستخدم تدرّجات لا لوحة ألوان — جُرّب وفشل.
+     تُضاف حين يُشحن ملف خط محلي. */
+  var FONTS = {
+    naskh:   { ar: "نسخ",     en: "Naskh" },
+    kufi:    { ar: "كوفي",    en: "Kufi" },
+    thuluth: { ar: "ثلث",     en: "Thuluth" },
+    auto:    { ar: "افتراضي", en: "Default" }
+  };
 
   var TITLES = {
     "ar":     { ar: "تتبّع الحروف العربية", en: "Arabic letter tracing" },
@@ -96,7 +116,6 @@
     "ar-num": { ar: "لوّن الرقم", en: "Colour the numeral" },
     "en-num": { ar: "لوّن الرقم", en: "Colour the numeral" }
   };
-  var REPS = { ar: 6, en: 8, "ar-num": 8, "en-num": 8 };
   /* عدد صفوف التتبّع يملأ الورقة: كلما قلّ عدد الحروف زاد التمرين. */
   var ROWS = { 1: 8, 2: 5, 4: 3 };
 
@@ -106,13 +125,19 @@
     var r = rng(state.seed);
     var start = Math.floor(r() * list.length);
 
+    var font = FONTS[state.font] ? state.font : "auto";
+    var fc = " f-" + font;
+
     if (state.mode === "color") {
       var ch = list[start];
       var name = script === "ar" && NAMES[ch] ? '<div class="cl-name">' + esc(NAMES[ch]) + "</div>" : "";
       return {
         title: COLOR_TITLES[script],
-        sub: { ar: "لوّن داخل الحرف", en: "Colour inside the outline" },
-        sheet: '<div class="cl-wrap"><span class="cl-big">' + esc(ch) + "</span>" + name + "</div>",
+        sub: {
+          ar: "لوّن داخل الحرف" + (script === "ar" ? " · خط " + FONTS[font].ar : ""),
+          en: "Colour inside the outline" + (script === "ar" ? " · " + FONTS[font].en : "")
+        },
+        sheet: '<div class="cl-wrap' + fc + '"><span class="cl-big">' + esc(ch) + "</span>" + name + "</div>",
         answers: ""
       };
     }
@@ -120,19 +145,21 @@
     var per = Number(state.per) || 2;
     var blocks = [], i;
     for (i = 0; i < per; i++)
-      blocks.push(letterBlock(list[(start + i) % list.length], script, REPS[script], per <= 2, ROWS[per] || 4));
+      blocks.push(letterBlock(list[(start + i) % list.length], script, per <= 2, ROWS[per] || 4));
     return {
       title: TITLES[script],
       sub: {
         /* المثنّى في العربية ليس جمعاً: «حرفان» لا «2 حروف». */
         ar: (per === 1 ? "حرف واحد" : per === 2 ? "حرفان" : per + " حروف") +
-            (per <= 2 && script === "ar" ? " · بأشكاله" : " · تتبّع"),
+            (per <= 2 && script === "ar" ? " · بأشكاله" : " · تتبّع") +
+            (script === "ar" ? " · خط " + FONTS[font].ar : ""),
         en: (per === 1 ? "One letter" : per + " letters")
       },
-      sheet: '<div class="lt-grid" data-per="' + per + '">' + blocks.join("") + "</div>",
+      sheet: '<div class="lt-grid' + fc + '" data-per="' + per + '">' + blocks.join("") + "</div>",
       answers: ""
     };
   }
 
-  return { render: render, forms: forms, alphabet: alphabet, NAMES: NAMES, NON_CONNECT: NON_CONNECT };
+  return { render: render, forms: forms, alphabet: alphabet, NAMES: NAMES,
+           NON_CONNECT: NON_CONNECT, FONTS: FONTS, ROW_FILL: ROW_FILL };
 });

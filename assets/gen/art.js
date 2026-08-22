@@ -169,58 +169,100 @@
     return { puzzle: svg(g.join("")), solution: svg(poly(pts, 0.6, cfg.kind !== "shell")), kind: cfg.kind };
   }
 
-  /* ══════ ٢. ماندالا للتلوين ══════ */
-  function mandala(seed, rings) {
-    var r = rng(seed), g = [], k = [6, 8, 10, 12, 16][Math.floor(r() * 5)];
-    g.push('<circle cx="50" cy="50" r="46" fill="none" stroke="#111" stroke-width="0.7"/>');
-    for (var ring = 0; ring < rings; ring++) {
-      var r0 = 6 + (40 / rings) * ring, r1 = 6 + (40 / rings) * (ring + 1);
-      var kind = Math.floor(r() * 3), mult = ring % 2 ? 2 : 1;
-      g.push('<circle cx="50" cy="50" r="' + r1.toFixed(2) + '" fill="none" stroke="#111" stroke-width="0.45"/>');
-      for (var i = 0; i < k * mult; i++) {
-        var th = (i / (k * mult)) * PI2, c = Math.cos(th), s = Math.sin(th);
-        var x0 = 50 + r0 * c, y0 = 50 + r0 * s, x1 = 50 + r1 * c, y1 = 50 + r1 * s;
-        if (kind === 0) {
-          g.push('<line x1="' + x0.toFixed(2) + '" y1="' + y0.toFixed(2) + '" x2="' + x1.toFixed(2) +
-                 '" y2="' + y1.toFixed(2) + '" stroke="#111" stroke-width="0.4"/>');
-        } else if (kind === 1) {
-          /* بتلة: قوسان متقابلان بين نصفَي القطر. */
-          var th2 = ((i + 1) / (k * mult)) * PI2;
-          var x2 = 50 + r1 * Math.cos(th2), y2 = 50 + r1 * Math.sin(th2);
-          g.push('<path d="M' + x0.toFixed(2) + ' ' + y0.toFixed(2) + ' Q' + x1.toFixed(2) + ' ' + y1.toFixed(2) +
-                 ' ' + x2.toFixed(2) + ' ' + y2.toFixed(2) + '" fill="none" stroke="#111" stroke-width="0.4"/>');
+  /* ══════ ٢. شمسة — زخرفة إسلامية شعاعية ══════
+     البناء تقليدي لا اعتباطي: دائرة مقسومة على n، ونجمة {n/k} تُرسم
+     بوصل كل رأس بالرأس الذي يبعد k خطوات، ثم كؤوس (بتلات) بين الأذرع.
+     هذا هو التوليد الهندسي للشمسة كما تُرسم بالفرجار والمسطرة. */
+  function ring(R, w) {
+    return '<circle cx="50" cy="50" r="' + R.toFixed(2) + '" fill="none" stroke="#111" stroke-width="' + w + '"/>';
+  }
+
+  /* الشمسة تُبنى **خلايا مغلقة** لا خطوطاً متقاطعة.
+     تراكب نجوم {n/k} يعطي شبكة مزدحمة بخلايا مجهرية لا تُلوَّن —
+     جُرّب أولاً وشوهد. لذلك كل حلقة هنا مقسومة إلى معيّنات وأقواس
+     رؤوسها على الدائرتين الحاصرتين، فتُغلق المساحات من تلقائها. */
+  function P(R, i, n, off) {
+    var th = ((i + (off || 0)) / n) * PI2 - Math.PI / 2;
+    return [50 + R * Math.cos(th), 50 + R * Math.sin(th)];
+  }
+
+  function shamsa(seed, level) {
+    var r = rng(seed), g = [];
+    var n = [8, 10, 12][Math.floor(r() * 3)];
+    var layers = level === "easy" ? 2 : (level === "med" ? 3 : 4);
+    var i, L;
+
+    g.push(ring(47, 0.9));
+
+    /* الطوق: كؤوس متتالية بين الدائرتين — يُغلق الشكل من الخارج. */
+    var B1 = 47, B0 = 41;
+    g.push(ring(B0, 0.55));
+    for (i = 0; i < n * 2; i++) {
+      var q0 = P(B0, i, n * 2, 0), q1 = P(B0, i + 1, n * 2, 0), qm = P(B1, i + 0.5, n * 2, 0);
+      g.push('<path d="M' + q0[0].toFixed(2) + " " + q0[1].toFixed(2) +
+             " Q" + qm[0].toFixed(2) + " " + qm[1].toFixed(2) +
+             " " + q1[0].toFixed(2) + " " + q1[1].toFixed(2) +
+             '" fill="none" stroke="#111" stroke-width="0.5"/>');
+    }
+
+    var R1 = B0 - 1.5, step = (R1 - 9) / layers;
+    for (L = 0; L < layers; L++) {
+      var r1 = R1 - L * step, r0 = r1 - step, off = L % 2 ? 0.5 : 0;
+      g.push(ring(r0, 0.45));
+      var mode = Math.floor(r() * 3);
+      for (i = 0; i < n; i++) {
+        var a = P(r0, i, n, off), b = P((r0 + r1) / 2, i + 0.5, n, off),
+            c = P(r1, i, n, off), d = P((r0 + r1) / 2, i - 0.5, n, off);
+        if (mode === 0) {
+          g.push(poly([a, b, c, d], 0.5, true));                 /* معيّن */
+        } else if (mode === 1) {
+          /* بتلة: قوسان من الداخل إلى الخارج ⇒ مساحة مغلقة قابلة للتلوين. */
+          g.push('<path d="M' + a[0].toFixed(2) + " " + a[1].toFixed(2) +
+                 " Q" + b[0].toFixed(2) + " " + b[1].toFixed(2) + " " + c[0].toFixed(2) + " " + c[1].toFixed(2) +
+                 " Q" + d[0].toFixed(2) + " " + d[1].toFixed(2) + " " + a[0].toFixed(2) + " " + a[1].toFixed(2) +
+                 'Z" fill="none" stroke="#111" stroke-width="0.5"/>');
         } else {
-          var rm = (r0 + r1) / 2, rad = (r1 - r0) * 0.34;
-          g.push('<circle cx="' + (50 + rm * c).toFixed(2) + '" cy="' + (50 + rm * s).toFixed(2) +
-                 '" r="' + rad.toFixed(2) + '" fill="none" stroke="#111" stroke-width="0.4"/>');
+          var e = P(r1, i + 1, n, off);
+          g.push(poly([a, c, e], 0.5, true));                    /* مثلّث شعاعي */
         }
       }
     }
+
+    /* القلب: وردة من n بتلات حول المركز. */
+    var Rc = R1 - layers * step;
+    g.push(ring(Rc, 0.5));
+    for (i = 0; i < n; i++) {
+      var s0 = P(Rc, i, n, 0), s1 = P(Rc, i + 1, n, 0), sm = P(Rc * 0.28, i + 0.5, n, 0);
+      g.push('<path d="M' + s0[0].toFixed(2) + " " + s0[1].toFixed(2) +
+             " Q" + sm[0].toFixed(2) + " " + sm[1].toFixed(2) + " " +
+             s1[0].toFixed(2) + " " + s1[1].toFixed(2) + '" fill="none" stroke="#111" stroke-width="0.45"/>');
+    }
+    g.push(ring(Rc * 0.22, 0.5));
     return svg(g.join(""));
   }
 
-  /* ══════ ٣. زخرفة هندسية متكرِّرة (نجمة مثمّنة متشابكة) ══════ */
-  function pattern(seed, cells) {
-    var r = rng(seed), g = [], u = 100 / cells;
-    var points = 6 + 2 * Math.floor(r() * 3);          /* ٦ أو ٨ أو ١٠ رؤوس */
-    var inner = 0.36 + r() * 0.16;
-    for (var gy = 0; gy < cells; gy++) for (var gx = 0; gx < cells; gx++) {
-      var cx = (gx + 0.5) * u, cy = (gy + 0.5) * u, pts = [];
-      for (var i = 0; i < points * 2; i++) {
-        var th = (i / (points * 2)) * PI2 - Math.PI / 2;
-        var rad = (i % 2 ? inner : 0.47) * u;
-        pts.push([cx + rad * Math.cos(th), cy + rad * Math.sin(th)]);
+  /* ══════ ٣. تسطيح گيري — نجمة ومضلّع متكرران ══════
+     التبليط الكلاسيكي «نجمة وصليب»: نجمة ثمانية في مركز كل خلية،
+     ومربّع مائل بين كل أربع خلايا ⇒ الشبكة تبدو متشابكة لا مكرَّرة. */
+  function girih(seed, cells) {
+    var r = rng(seed), g = [], u = 100 / cells, gx, gy, i;
+    var n = [8, 12][Math.floor(r() * 2)];
+    var inner = n === 8 ? 0.414 : 0.268;      /* نسبة النجمة المنتظمة الحقيقية */
+    for (gy = 0; gy < cells; gy++) for (gx = 0; gx < cells; gx++) {
+      var cx = (gx + 0.5) * u, cy = (gy + 0.5) * u, P = [];
+      for (i = 0; i < n * 2; i++) {
+        var th = (i / (n * 2)) * PI2 - Math.PI / 2;
+        var rad = (i % 2 ? inner * 0.5 * u * 1.9 : 0.47 * u);
+        P.push([cx + rad * Math.cos(th), cy + rad * Math.sin(th)]);
       }
-      g.push(poly(pts, 0.42, true));
-      g.push('<circle cx="' + cx.toFixed(2) + '" cy="' + cy.toFixed(2) + '" r="' + (inner * u * 0.55).toFixed(2) +
-             '" fill="none" stroke="#111" stroke-width="0.42"/>');
-      /* الشبكة القطرية تربط الخلايا فتبدو الزخرفة متشابكة لا مكرّرة. */
-      g.push('<line x1="' + (gx * u) + '" y1="' + (gy * u) + '" x2="' + ((gx + 1) * u) + '" y2="' + ((gy + 1) * u) +
-             '" stroke="#111" stroke-width="0.22"/>');
-      g.push('<line x1="' + ((gx + 1) * u) + '" y1="' + (gy * u) + '" x2="' + (gx * u) + '" y2="' + ((gy + 1) * u) +
-             '" stroke="#111" stroke-width="0.22"/>');
+      g.push(poly(P, 0.45, true));
+      /* المربّع المائل في التقاطع يربط أربع نجوم. */
+      if (gx < cells - 1 && gy < cells - 1) {
+        var jx = (gx + 1) * u, jy = (gy + 1) * u, h = u * 0.19;
+        g.push(poly([[jx, jy - h], [jx + h, jy], [jx, jy + h], [jx - h, jy]], 0.45, true));
+      }
     }
-    g.push('<rect x="0.3" y="0.3" width="99.4" height="99.4" fill="none" stroke="#111" stroke-width="0.7"/>');
+    g.push('<rect x="0.4" y="0.4" width="99.2" height="99.2" fill="none" stroke="#111" stroke-width="0.8"/>');
     return svg(g.join(""));
   }
 
@@ -250,21 +292,20 @@
   /* ══════ الواجهة ══════ */
   var TITLES = {
     dots:     { ar: "وصّل النقاط", en: "Connect the dots" },
-    mandala:  { ar: "ماندالا للتلوين", en: "Mandala colouring" },
-    pattern:  { ar: "زخرفة هندسية للتلوين", en: "Geometric pattern" },
+    shamsa:   { ar: "شمسة — زخرفة إسلامية", en: "Shamsa — Islamic rosette" },
+    girih:    { ar: "زخرفة متكرِّرة", en: "Repeating ornament" },
     symmetry: { ar: "أكمل النصف الآخر", en: "Complete the symmetry" }
   };
   var LV = { easy: { ar: "سهل", en: "Easy" }, med: { ar: "متوسط", en: "Medium" }, hard: { ar: "صعب", en: "Hard" } };
   var DOTS_N = { easy: 20, med: 38, hard: 60 };
-  var RINGS  = { easy: 3, med: 4, hard: 6 };
   var CELLS  = { easy: 2, med: 3, hard: 4 };
 
   function render(state) {
     var t = state.type, lv = state.level || "med", seed = state.seed;
     var puzzle, solution = "";
     if (t === "dots") { var d = dots(seed, DOTS_N[lv]); puzzle = d.puzzle; solution = d.solution; }
-    else if (t === "mandala") puzzle = mandala(seed, RINGS[lv]);
-    else if (t === "pattern") puzzle = pattern(seed, CELLS[lv]);
+    else if (t === "shamsa") puzzle = shamsa(seed, lv);
+    else if (t === "girih") puzzle = girih(seed, CELLS[lv]);
     else { var s = symmetry(seed); puzzle = s.puzzle; solution = s.solution; }
 
     var wrap = function (x) { return '<div class="art-wrap">' + x + "</div>"; };
@@ -276,5 +317,5 @@
     };
   }
 
-  return { render: render, dots: dots, mandala: mandala, pattern: pattern, symmetry: symmetry, CURVES: CURVES };
+  return { render: render, dots: dots, shamsa: shamsa, girih: girih, symmetry: symmetry, CURVES: CURVES };
 });

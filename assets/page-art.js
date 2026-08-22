@@ -7,8 +7,8 @@
     controls: [
       { k: "type", label: { ar: "النشاط", en: "Activity" }, opts: [
         { v: "dots",     ar: "وصّل النقاط", en: "Connect dots" },
-        { v: "mandala",  ar: "ماندالا",     en: "Mandala" },
-        { v: "pattern",  ar: "زخرفة",       en: "Pattern" },
+        { v: "shamsa",   ar: "شمسة",       en: "Rosette" },
+        { v: "girih",    ar: "زخرفة متكرِّرة", en: "Ornament" },
         { v: "symmetry", ar: "تناظر",       en: "Symmetry" }
       ] },
       { k: "level", label: { ar: "المستوى", en: "Level" }, opts: [

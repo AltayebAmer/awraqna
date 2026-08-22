@@ -4,7 +4,7 @@
   Core.mount({
     key: "language",
     answers: false,
-    state: { script: "ar", mode: "trace", per: 2 },
+    state: { script: "ar", mode: "trace", per: 2, font: "naskh" },
     controls: [
       { k: "script", label: { ar: "الأبجدية", en: "Alphabet" }, opts: [
         { v: "ar",     ar: "حروف عربية",   en: "Arabic letters" },
@@ -15,6 +15,12 @@
       { k: "mode", label: { ar: "النشاط", en: "Activity" }, opts: [
         { v: "trace", ar: "تتبّع", en: "Trace" },
         { v: "color", ar: "تلوين", en: "Colour" }
+      ] },
+      { k: "font", label: { ar: "الخط", en: "Script style" }, opts: [
+        { v: "naskh",   ar: "نسخ",     en: "Naskh" },
+        { v: "kufi",    ar: "كوفي",    en: "Kufi" },
+        { v: "thuluth", ar: "ثلث",     en: "Thuluth" },
+        { v: "auto",    ar: "افتراضي", en: "Default" }
       ] },
       { k: "per", label: { ar: "لكل ورقة", en: "Per page" }, opts: [
         { v: 1, ar: "حرف واحد", en: "One" },
