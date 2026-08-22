@@ -1,0 +1,48 @@
+/* ════════════════════════════════════════════════════════════
+   أوراقنا — قشرة الصفحة المشتركة (شاشة فقط، لا تُطبع).
+   مبدّل اللغة هنا: سمتان وقاعدتا CSS، بلا مكتبة i18n.
+   ════════════════════════════════════════════════════════════ */
+
+.hero{text-align:center;padding:26px 0 4px}
+.hero h1{font-size:clamp(24px,5vw,34px);font-weight:900;letter-spacing:.2px}
+.hero p{color:var(--txt-dim);margin-top:8px;font-size:15px}
+
+.wrap-actions{max-width:var(--maxw);margin:0 auto}
+.site-footer{border-top:1px solid var(--line);margin-top:34px;padding:22px 0;
+  color:var(--txt-mute);font-size:13px;text-align:center}
+
+/* ---------- الصفحة الرئيسية: بطاقات المجالات ---------- */
+.areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;margin:26px 0 10px}
+.area{display:flex;gap:14px;align-items:flex-start;padding:20px;border-radius:var(--radius);
+  border:1px solid var(--line);background:var(--card);transition:.18s;min-width:0}
+.area:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--shadow)}
+.area .ico{flex:none;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+  font-size:22px;background:var(--card-2);border:1px solid var(--line-2)}
+.area h3{font-size:17px;font-weight:800;margin-bottom:5px}
+.area p{font-size:13.5px;color:var(--txt-dim);line-height:1.55}
+.area .tags{margin-top:9px;font-size:11.5px;color:var(--txt-mute);letter-spacing:.2px}
+.area.soon{opacity:.55;pointer-events:none}
+.area.soon .ico{color:var(--txt-mute)}
+.badge-soon{display:inline-block;margin-inline-start:7px;font-size:10px;font-weight:800;
+  padding:2px 7px;border-radius:999px;background:var(--card-2);color:var(--txt-mute);
+  border:1px solid var(--line-2);vertical-align:middle}
+
+@media (max-width:640px){
+  .areas{grid-template-columns:1fr}
+  .wrap-actions{padding:0}
+}
+
+/* ════════════════════════════════════════════════════════════
+   مبدّل اللغة — **في نهاية الملف عمداً.**
+   تساوي التخصيص يجعل الأخير هو الفائز؛ لو وُضعت هذه القواعد
+   في الأعلى لتغلّب عليها أي `display` في قاعدة مكوّن لاحقة
+   (حدث فعلاً مع .badge-soon فظهر «قريباً» و«Soon» معاً).
+   ════════════════════════════════════════════════════════════ */
+[data-en]{display:none}
+html[lang=en] [data-ar]{display:none}
+html[lang=en] [data-en]{display:inline}
+html[lang=en] .blk[data-en]{display:block}
+.blk[data-ar]{display:block}
+html[lang=en] .badge-soon[data-en]{display:inline-block}
+.badge-soon[data-ar]{display:inline-block}

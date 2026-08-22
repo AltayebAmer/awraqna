@@ -47,10 +47,33 @@
 .vform .ansbox{display:block;height:30px;border:1px solid #b8b8b8;border-radius:4px;
   margin-top:5px;background:#fcfcfc}
 
+/* ---------- أسئلة سطرية: المقارنة والأنماط ---------- */
+.inline-q{flex:1;min-width:0;font-variant-numeric:tabular-nums;
+  font-family:'SF Mono',Menlo,Consolas,monospace;font-size:17px;font-weight:700;
+  direction:ltr;text-align:left;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  line-height:1.15}
+.vform .ansbox.inline,.inline-q .ansbox{display:inline-block;height:26px;min-width:52px;
+  vertical-align:middle;margin-top:0}
+.inline-q .ansbox.sm{min-width:38px}
+/* الأنماط تحتاج عرضاً أكبر ⇒ عمودان بدل أربعة. */
+.q-grid.wide{grid-template-columns:repeat(2,1fr)}
+
 .a-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px 14px;
   font-family:'SF Mono',Menlo,Consolas,monospace;font-size:14px;font-weight:700;direction:ltr;text-align:left}
 .a-grid div{break-inside:avoid;border-bottom:1px solid #e3e3e3;padding-bottom:3px}
 .a-grid u{text-decoration:none;color:#888;margin-inline-end:5px}
+
+/* ---------- الألغاز وأوراق المعلّم ---------- */
+.puz-grid{display:grid;gap:16px}
+.puz{position:relative;break-inside:avoid;page-break-inside:avoid;min-width:0}
+.puz-n{position:absolute;top:-4px;inset-inline-start:0;font-size:11px;font-weight:800;
+  color:#666;background:#eee;border-radius:999px;width:20px;height:20px;
+  display:grid;place-items:center;z-index:2}
+.puz-svg{display:block;width:100%;height:auto;max-height:245mm;margin:0 auto}
+/* 2×118mm + الترويسة + الفجوة = ما يسع مساحة الطباعة (273mm) بالضبط.
+   جُرّب 126mm ⇒ أربع صفحات بدل صفحتين. لا تزده بلا إعادة قياس. */
+.puz-grid[data-per="2"] .puz-svg,.puz-grid[data-per="4"] .puz-svg{max-height:118mm}
+.paper{display:block;width:100%;height:auto}
 
 /* ---------- الموبايل ---------- */
 @media (max-width:640px){
@@ -58,6 +81,8 @@
   #print-root{padding:0 14px}
   .sheet{padding:16px 14px}
   .q-grid{grid-template-columns:repeat(2,1fr)}
+  .q-grid.wide{grid-template-columns:1fr}
+  .inline-q{font-size:15px}
   .a-grid{grid-template-columns:repeat(3,1fr)}
   .vform{font-size:16px}
 }
@@ -84,7 +109,13 @@
   .vform{font-size:15px}
   .vform .rule{border-top-color:#000}
   .vform .ansbox{height:30px;border-color:#9a9a9a;background:none}
+  .inline-q{font-size:15px}
+  .inline-q .ansbox{height:24px;border-color:#9a9a9a;background:none}
   .q-item{padding-bottom:8px;border-bottom-color:#d0d0d0}
   .sheet-head{border-bottom-color:#000}
   .a-grid div{border-bottom-color:#bbb}
+  /* الورقة الكاملة (ورق المعلّم) تملأ مساحة الطباعة بلا حشو. */
+  .paper{width:186mm;height:auto}
+  .puz-grid{gap:12px}
+  .puz-n{background:none;border:1px solid #999;color:#000}
 }

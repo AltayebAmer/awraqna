@@ -7,7 +7,7 @@
   "use strict";
   var api = factory();
   if (typeof module === "object" && module.exports) module.exports = api;
-  else root.Generators = api;
+  else root.MathGen = api;
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
@@ -84,6 +84,30 @@
       if (diff === "hard" && a > b && !needsBorrow(a, b)) return null;
       return { a: a, op: "−", b: b, answer: a - b };
     },
+    div: function (rng, g, diff) {
+      /* نبني من الناتج للأسفل: b × q = a ⇒ القسمة صحيحة دائماً بلا كسور. */
+      var rb = slice(GRADE[g].mulB, diff), rq = slice(GRADE[g].mulA, diff);
+      var b = randInt(rng, Math.max(2, rb[0]), rb[1]);
+      var q = randInt(rng, Math.max(2, rq[0]), rq[1]);
+      if (diff === "hard" && q <= 1) return null;
+      return { a: b * q, op: "\u00f7", b: b, answer: q };
+    },
+    cmp: function (rng, g, diff) {
+      var max = Math.max(3, Math.round(GRADE[g].addMax * ADD_SCALE[diff]));
+      var a = randInt(rng, 1, max), b = randInt(rng, 1, max);
+      /* المتساويان مفيدان تربوياً لكن نادرَين طبيعياً — نفرضهما بنسبة السدس. */
+      if (rng() < 0.16) b = a;
+      return { a: a, op: "?", b: b, answer: a > b ? ">" : (a < b ? "<" : "=") };
+    },
+    pat: function (rng, g, diff) {
+      var step = randInt(rng, 2, diff === "easy" ? 5 : (diff === "med" ? 10 : 25));
+      if (diff !== "easy" && rng() < 0.3) step = -step;
+      var start = randInt(rng, 1, Math.max(5, Math.round(GRADE[g].addMax * 0.4)));
+      if (step < 0) start = Math.abs(step) * 4 + randInt(rng, 1, 20);
+      var seq = [start, start + step, start + 2 * step, start + 3 * step];
+      if (seq.some(function (n) { return n < 0; })) return null;
+      return { seq: seq, op: "…", a: seq[0], b: step, answer: start + 4 * step };
+    },
     mul: function (rng, g, diff) {
       var ra = slice(GRADE[g].mulA, diff), rb = slice(GRADE[g].mulB, diff);
       var a = randInt(rng, ra[0], ra[1]), b = randInt(rng, rb[0], rb[1]);
@@ -92,7 +116,7 @@
     }
   };
 
-  function key(q) { return q.a + q.op + q.b; }
+  function key(q) { return q.seq ? q.seq.join(",") : (q.a + q.op + q.b); }
 
   /* ── الواجهة العامة ───────────────────────────────────────
      generate(skill, {grade, difficulty, count, seed}) → Question[] */
@@ -135,5 +159,49 @@
     return out;
   }
 
-  return { generate: generate, mulberry32: mulberry32, SKILLS: Object.keys(SKILLS) };
+
+  /* ── العرض ────────────────────────────────────────────────
+     يعيد نصوصاً لا يلمس DOM ⇒ قابل للاختبار في node مثل المولّدات. */
+  var TITLES = {
+    add: { ar: "أوراق عمل — الجمع", en: "Worksheet — Addition" },
+    sub: { ar: "أوراق عمل — الطرح", en: "Worksheet — Subtraction" },
+    mul: { ar: "أوراق عمل — الضرب", en: "Worksheet — Multiplication" },
+    div: { ar: "أوراق عمل — القسمة", en: "Worksheet — Division" },
+    cmp: { ar: "أوراق عمل — المقارنة", en: "Worksheet — Comparing" },
+    pat: { ar: "أوراق عمل — الأنماط", en: "Worksheet — Patterns" }
+  };
+  var DIFF = { easy: { ar: "سهل", en: "Easy" }, med: { ar: "متوسط", en: "Medium" }, hard: { ar: "صعب", en: "Hard" } };
+
+  function item(q, i) {
+    var body;
+    if (q.seq) {
+      body = '<span class="inline-q">' + q.seq.join(" ، ") +
+             ' ، <span class="ansbox inline"></span></span>';
+    } else if (q.op === "?") {
+      body = '<span class="inline-q">' + q.a + ' <span class="ansbox inline sm"></span> ' + q.b + "</span>";
+    } else {
+      body = '<span class="vform"><b>' + q.a + "</b>" +
+             '<span class="op-line"><i>' + q.op + "</i><b>" + q.b + "</b></span>" +
+             '<span class="rule"></span><span class="ansbox"></span></span>';
+    }
+    return '<div class="q-item"><span class="q-num">' + (i + 1) + "</span>" + body + "</div>";
+  }
+
+  function render(state) {
+    var qs = generate(state.skill, state);
+    var wide = state.skill === "pat";
+    return {
+      title: TITLES[state.skill] || TITLES.add,
+      sub: {
+        ar: "الصف " + state.grade + " · " + DIFF[state.difficulty].ar + " · " + qs.length + " سؤالاً",
+        en: "Grade " + state.grade + " \u00b7 " + DIFF[state.difficulty].en + " \u00b7 " + qs.length + " questions"
+      },
+      sheet: '<div class="q-grid' + (wide ? " wide" : "") + '">' + qs.map(item).join("") + "</div>",
+      answers: '<div class="a-grid">' + qs.map(function (q, i) {
+        return "<div><u>" + (i + 1) + ".</u>" + q.answer + "</div>";
+      }).join("") + "</div>"
+    };
+  }
+
+  return { generate: generate, render: render, mulberry32: mulberry32, SKILLS: Object.keys(SKILLS) };
 });

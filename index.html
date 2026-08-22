@@ -3,36 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>أوراقنا — مولّد أوراق عمل رياضيات للطباعة</title>
-<meta name="description" content="ولّد أوراق عمل رياضيات (جمع، طرح، ضرب) قابلة للطباعة مجاناً، بأسئلة عشوائية وصفحة إجابات منفصلة. يعمل كلياً في متصفحك.">
+<title>أوراقنا — أوراق عمل ومواد تعليمية للطباعة مجاناً</title>
+<meta name="description" content="مولّدات أوراق عمل قابلة للطباعة: رياضيات، ألغاز وسودوكو، أوراق مسطرة وشبكية، فنون وتلوين، حروف ولغات. كل شيء يُولَّد في متصفحك مجاناً وبلا تسجيل.">
 <link rel="canonical" href="https://awraqna.com/">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta property="og:title" content="أوراقنا — مولّد أوراق عمل رياضيات للطباعة">
-<meta property="og:description" content="أوراق عمل رياضيات جاهزة للطباعة، مجاناً وبلا تسجيل.">
+<meta property="og:title" content="أوراقنا — أوراق عمل ومواد تعليمية للطباعة">
+<meta property="og:description" content="مولّدات أوراق عمل مجانية تعمل كلياً في متصفحك.">
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="assets/brand.css">
-<link rel="stylesheet" href="assets/sheet.css">
+<link rel="stylesheet" href="assets/page.css">
 <style>
-  /* مبدّل اللغة — نفس نمط 007: سمتان وقاعدتا CSS، بلا مكتبة i18n. */
-  [data-en]{display:none}
-  html[lang=en] [data-ar]{display:none}
-  html[lang=en] [data-en]{display:inline}
-  html[lang=en] .blk[data-en]{display:block}
-  .blk[data-ar]{display:block}
-  .hero{text-align:center;padding:26px 0 4px}
-  .hero h1{font-size:clamp(24px,5vw,34px);font-weight:900;letter-spacing:.2px}
-  .hero p{color:var(--txt-dim);margin-top:8px;font-size:15px}
-  .site-footer{border-top:1px solid var(--line);margin-top:34px;padding:22px 0;
-    color:var(--txt-mute);font-size:13px;text-align:center}
+  .hero{padding:40px 0 6px}
+  .hero p{max-width:620px;margin:10px auto 0}
+  .sec-title{margin:30px 0 4px;font-size:15px;font-weight:800;color:var(--txt-dim);
+    letter-spacing:.3px;border-inline-start:3px solid var(--gold);padding-inline-start:10px}
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <div class="wrap nav">
-    <a class="brand" href="./"><span class="logo">أ</span>
+    <a class="brand" href="/"><span class="logo">أ</span>
       <span data-ar>أوراق<b>نا</b></span><span data-en>Awraq<b>na</b></span></a>
     <div class="nav-actions">
       <button class="btn btn-lang" id="langBtn" type="button">EN</button>
@@ -42,53 +35,108 @@
 
 <main class="wrap">
   <section class="hero">
-    <h1><span data-ar>مولّد أوراق عمل الرياضيات</span><span data-en>Math Worksheet Generator</span></h1>
-    <p><span class="blk" data-ar>اختر، اطبع، وزّع. أسئلة جديدة في كل مرة — مجاناً وبلا تسجيل.</span>
-       <span class="blk" data-en>Pick, print, hand out. Fresh questions every time — free, no sign-up.</span></p>
+    <h1><span data-ar>أوراق عمل جاهزة للطباعة — تُولَّد الآن</span>
+        <span data-en>Printable worksheets — generated on the spot</span></h1>
+    <p><span class="blk" data-ar>اختر مجالاً، اضبط الإعدادات، واطبع. كل ورقة تُولَّد من جديد في كل مرة،
+       وكل شيء يجري داخل متصفحك — بلا تسجيل وبلا رفع ملفات.</span>
+       <span class="blk" data-en>Pick an area, set it up, print. Every sheet is generated fresh,
+       entirely inside your browser — no sign-up, no uploads.</span></p>
   </section>
 
-  <section class="controls" aria-label="إعدادات الورقة">
-    <div class="ctl-row">
-      <div class="ctl-label"><span data-ar>الصف</span><span data-en>Grade</span></div>
-      <div class="chips" id="gradeChips" role="group"></div>
-    </div>
-    <div class="ctl-row">
-      <div class="ctl-label"><span data-ar>المهارة</span><span data-en>Skill</span></div>
-      <div class="chips" id="skillChips" role="group"></div>
-    </div>
-    <div class="ctl-row">
-      <div class="ctl-label"><span data-ar>الصعوبة</span><span data-en>Difficulty</span></div>
-      <div class="chips" id="diffChips" role="group"></div>
-    </div>
-    <div class="ctl-row">
-      <div class="ctl-label"><span data-ar>عدد الأسئلة</span><span data-en>Questions</span></div>
-      <div class="chips" id="countChips" role="group"></div>
-    </div>
-    <div class="ctl-row">
-      <div class="ctl-label"><span data-ar>الإجابات</span><span data-en>Answers</span></div>
-      <div class="chips">
-        <button class="chip" type="button" id="ansToggle" aria-pressed="true">
-          <span data-ar>اطبع صفحة الإجابات</span><span data-en>Print answer key</span></button>
+  <h2 class="sec-title"><span data-ar>متاح الآن</span><span data-en>Available now</span></h2>
+  <div class="areas">
+
+    <a class="area" href="/math/">
+      <div class="ico">➗</div>
+      <div>
+        <h3><span data-ar>الرياضيات</span><span data-en>Mathematics</span></h3>
+        <p><span data-ar>جمع، طرح، ضرب، قسمة، مقارنة، وأنماط — للصفوف من الأول إلى السادس، مع صفحة إجابات.</span>
+           <span data-en>Addition, subtraction, multiplication, division, comparing and patterns — grades 1–6, with an answer key.</span></p>
+        <div class="tags"><span data-ar>٦ مهارات · ٦ صفوف · ٣ مستويات</span>
+                          <span data-en>6 skills · 6 grades · 3 levels</span></div>
+      </div>
+    </a>
+
+    <a class="area" href="/puzzles/">
+      <div class="ico">🧩</div>
+      <div>
+        <h3><span data-ar>الألغاز والمنطق</span><span data-en>Puzzles &amp; Logic</span></h3>
+        <p><span data-ar>سودوكو بأحجام ٤×٤ و٦×٦ و٩×٩، ومتاهات بمستويات — مع صفحة حلول منفصلة.</span>
+           <span data-en>Sudoku in 4×4, 6×6 and 9×9, plus mazes at several levels — with a separate solution page.</span></p>
+        <div class="tags"><span data-ar>سودوكو · متاهات</span><span data-en>Sudoku · Mazes</span></div>
+      </div>
+    </a>
+
+    <a class="area" href="/teacher/">
+      <div class="ico">📐</div>
+      <div>
+        <h3><span data-ar>أوراق المعلّم</span><span data-en>Teacher Paper</span></h3>
+        <p><span data-ar>ورق مسطر وشبكي ونقطي وورق رسم بياني، بالمقاس الذي تريده بالمليمتر.</span>
+           <span data-en>Lined, grid, dotted and graph paper — sized to the millimetre.</span></p>
+        <div class="tags"><span data-ar>٤ أنواع ورق · مقاسات دقيقة</span>
+                          <span data-en>4 paper types · exact sizing</span></div>
+      </div>
+    </a>
+
+  </div>
+
+  <div data-ad-slot="leaderboard"></div>
+
+  <h2 class="sec-title"><span data-ar>قيد الإعداد</span><span data-en>In progress</span></h2>
+  <div class="areas">
+
+    <div class="area soon">
+      <div class="ico">🎨</div>
+      <div>
+        <h3><span data-ar>الفنون والرسم</span><span data-en>Art &amp; Drawing</span>
+            <span class="badge-soon" data-ar>قريباً</span><span class="badge-soon" data-en>Soon</span></h3>
+        <p><span data-ar>توصيل النقاط، وأوراق تلوين بزخارف هندسية وماندالا — كلها مولَّدة رياضياً، لا مرسومة.</span>
+           <span data-en>Connect-the-dots and colouring pages built from geometric patterns and mandalas — generated, not drawn.</span></p>
       </div>
     </div>
 
-    <div class="ctl-actions">
-      <button class="btn btn-primary" type="button" id="printBtn">
-        <span data-ar>🖨️ اطبع الورقة</span><span data-en>🖨️ Print worksheet</span></button>
-      <button class="btn" type="button" id="regenBtn">
-        <span data-ar>🔄 إعادة توليد</span><span data-en>🔄 Regenerate</span></button>
+    <div class="area soon">
+      <div class="ico">🔤</div>
+      <div>
+        <h3><span data-ar>الحروف واللغات</span><span data-en>Letters &amp; Languages</span>
+            <span class="badge-soon" data-ar>قريباً</span><span class="badge-soon" data-en>Soon</span></h3>
+        <p><span data-ar>تتبّع الحروف العربية بأشكالها الأربعة، والأرقام العربية والهندية، وأوراق تلوين الحروف.</span>
+           <span data-en>Trace Arabic letters in all four forms, Arabic and Hindi numerals, and letter colouring sheets.</span></p>
+      </div>
     </div>
-    <div class="seed-note" id="seedNote"></div>
-  </section>
 
-  <div data-ad-slot="rectangle"></div>
+    <div class="area soon">
+      <div class="ico">💻</div>
+      <div>
+        <h3><span data-ar>البرمجة</span><span data-en>Programming</span>
+            <span class="badge-soon" data-ar>قريباً</span><span class="badge-soon" data-en>Soon</span></h3>
+        <p><span data-ar>جداول تتبّع، أنظمة العد، جداول الحقيقة، والروبوت على الشبكة — برمجة بلا حاسوب.</span>
+           <span data-en>Trace tables, number bases, truth tables and grid-robot puzzles — coding unplugged.</span></p>
+      </div>
+    </div>
+
+    <div class="area soon">
+      <div class="ico">🔬</div>
+      <div>
+        <h3><span data-ar>العلوم والقياس</span><span data-en>Science &amp; Measurement</span>
+            <span class="badge-soon" data-ar>قريباً</span><span class="badge-soon" data-en>Soon</span></h3>
+        <p><span data-ar>ورق رسم بياني متخصص، تحويل الوحدات، وشبكات الإحداثيات.</span>
+           <span data-en>Specialised graph paper, unit conversion and coordinate grids.</span></p>
+      </div>
+    </div>
+
+    <div class="area soon">
+      <div class="ico">🕐</div>
+      <div>
+        <h3><span data-ar>الوقت والمال</span><span data-en>Time &amp; Money</span>
+            <span class="badge-soon" data-ar>قريباً</span><span class="badge-soon" data-en>Soon</span></h3>
+        <p><span data-ar>قراءة الساعة، حساب المدة، تمارين العملات العربية، وتقويم شهري.</span>
+           <span data-en>Reading clocks, elapsed time, Arabic currency exercises and a monthly calendar.</span></p>
+      </div>
+    </div>
+
+  </div>
 </main>
-
-<!-- كل ما يُطبع بالداخل. كل ما بالخارج يختفي تلقائياً (sheet.css). -->
-<div id="print-root">
-  <article class="sheet" id="sheet"></article>
-  <article class="sheet" id="answers"></article>
-</div>
 
 <footer class="site-footer">
   <div class="wrap">
@@ -97,8 +145,23 @@
   </div>
 </footer>
 
-<script src="assets/generators.js"></script>
-<script src="assets/app.js"></script>
+<script>
+/* الرئيسية لا تحتاج النواة — مبدّل لغة فقط. */
+(function () {
+  var b = document.getElementById("langBtn");
+  function set(l) {
+    var h = document.documentElement;
+    h.setAttribute("lang", l);
+    h.setAttribute("dir", l === "en" ? "ltr" : "rtl");
+    b.textContent = l === "en" ? "ع" : "EN";
+    try { localStorage.setItem("awraqna_lang", l); } catch (e) {}
+  }
+  b.addEventListener("click", function () { set(h() === "en" ? "ar" : "en"); });
+  function h() { return document.documentElement.getAttribute("lang"); }
+  var s = null; try { s = localStorage.getItem("awraqna_lang"); } catch (e) {}
+  if (s === "en") set("en");
+})();
+</script>
 <script src="assets/ads.js" defer></script>
 </body>
 </html>
