@@ -16,6 +16,10 @@
 /assets/*
   Cache-Control: public, max-age=86400, must-revalidate
 
+# الخطوط لا تتغير أبداً بعد التجزئة ⇒ تخزين طويل، وهي أثقل ما في الموقع.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # الأيقونات لا تتغير — بصمتها في اسمها عملياً.
 /favicon.ico
   Cache-Control: public, max-age=31536000

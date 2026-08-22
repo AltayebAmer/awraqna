@@ -66,16 +66,26 @@
 .a-grid u{text-decoration:none;color:#888;margin-inline-end:5px}
 
 /* ---------- عائلات الخط العربي ----------
-   الأسماء عائلات نظام على macOS/iOS. على ويندوز/أندرويد يسقط الاختيار إلى
-   الاحتياط: الشكل صحيح لكن ليس بقواعد الخط المطلوب. الحل الجذري ملف خط محلي.
-   --fs معامل تكبير **مقيس** لا مُخمَّن: ارتفاع «سعك» عند 100px في كل عائلة
-   قُورن بـ Geeza Pro (71px) فنتجت هذه الأرقام. بدونه يبدو الثلث ضئيلاً
-   والكوفي متضخّماً في نفس الورقة. */
-.f-naskh{--fs:1.18;font-family:"Amiri","DecoType Naskh","Scheherazade New",
-  "Traditional Arabic","Amiri Quran","Geeza Pro",serif}
-.f-kufi{--fs:0.93;font-family:"Reem Kufi","Noto Kufi Arabic","KufiStandardGK",
-  "Diwan Kufi","Geeza Pro",sans-serif}
-.f-thuluth{--fs:1.03;font-family:"Diwan Thuluth","DecoType Thuluth","Amiri Quran","Geeza Pro",serif}
+   ملفات محلية بترخيص SIL OFL (النص في assets/fonts/OFL.txt) —
+   مجزّأة على المحارف العربية فقط: 669KB ⇒ 146KB.
+   محلية لا CDN، وتُحمَّل فقط حين يُختار الخط فعلاً.
+   احتياط النظام بعدها يخدم المتصفحات القديمة التي لا تدعم woff2.
+
+   --fs معامل تكبير **مقيس** لا مُخمَّن: ارتفاع حبر «سعكم» عند 100px قُورن
+   بالخط الافتراضي (110px) ⇒ نسخ 0.78 · رقعة 0.75 · كوفي 1.77 · ثلث 1.39.
+   ثم قُصَّت الأطراف إلى [0.85 , 1.12]: النسبة الخام تجعل الكوفي عريضاً
+   جداً فيفيض السطر، لأن ارتفاع حبره صغير وعرضه كبير معاً. */
+@font-face{font-family:"Amiri";src:url("fonts/amiri.woff2") format("woff2");
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Aref Ruqaa";src:url("fonts/aref-ruqaa.woff2") format("woff2");
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Reem Kufi";src:url("fonts/reem-kufi.woff2") format("woff2");
+  font-weight:400;font-style:normal;font-display:swap}
+
+.f-naskh{--fs:0.85;font-family:"Amiri","DecoType Naskh","Traditional Arabic","Geeza Pro",serif}
+.f-ruqaa{--fs:0.85;font-family:"Aref Ruqaa","Baghdad","Geeza Pro",serif}
+.f-kufi{--fs:1.12;font-family:"Reem Kufi","Noto Kufi Arabic","KufiStandardGK","Geeza Pro",sans-serif}
+.f-thuluth{--fs:1.08;font-family:"Diwan Thuluth","DecoType Thuluth","Amiri","Geeza Pro",serif}
 .f-auto{--fs:1;font-family:inherit}
 
 /* ---------- الألغاز وأوراق المعلّم ---------- */

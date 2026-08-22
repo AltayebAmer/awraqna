@@ -18,6 +18,7 @@
       ] },
       { k: "font", label: { ar: "الخط", en: "Script style" }, opts: [
         { v: "naskh",   ar: "نسخ",     en: "Naskh" },
+        { v: "ruqaa",   ar: "رقعة",    en: "Ruq\u02bfah" },
         { v: "kufi",    ar: "كوفي",    en: "Kufi" },
         { v: "thuluth", ar: "ثلث",     en: "Thuluth" },
         { v: "auto",    ar: "افتراضي", en: "Default" }

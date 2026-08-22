@@ -14,8 +14,13 @@
 | `../.claude/launch.json` | خارج المجلد أصلاً |
 
 الملفات المنشورة: `index.html` (الرئيسية) · `math/` · `puzzles/` · `teacher/`
+· `art/` · `language/` · `coding/` · `science/` · `time-money/`
 · `404.html` · `robots.txt` · `sitemap.xml` · `favicon.ico` · `favicon.svg`
-· `apple-touch-icon.png` · `_headers` · `assets/`
+· `apple-touch-icon.png` · `_headers` · `assets/` (بما فيه `assets/fonts/`)
+
+> **الخطوط:** `assets/fonts/` يحوي ثلاثة خطوط بترخيص SIL OFL مجزّأة على
+> المحارف العربية (146KB إجمالاً). **لا تحذف `assets/fonts/OFL.txt`** — بقاء
+> نص الرخصة مع الملفات شرطٌ في الترخيص.
 
 ## Cloudflare Pages (النطاق مُدار عندهم أصلاً ⇒ الأبسط)
 
@@ -33,7 +38,8 @@
 ```bash
 curl -sI https://awraqna.com | head -1
 curl -s https://awraqna.com/robots.txt
-curl -sI https://awraqna.com/assets/generators.js | grep -i cache-control
+curl -sI https://awraqna.com/assets/gen/math.js | grep -i cache-control
+curl -sI https://awraqna.com/assets/fonts/amiri.woff2 | grep -iE "content-type|cache-control" 
 curl -sI https://awraqna.com/nope | head -1
 for p in "" math/ puzzles/ teacher/; do curl -s -o /dev/null -w "$p %{http_code}\n" https://awraqna.com/$p; done
 ```
