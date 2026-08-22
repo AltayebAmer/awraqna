@@ -241,28 +241,56 @@
     return svg(g.join(""));
   }
 
-  /* ══════ ٣. تسطيح گيري — نجمة ومضلّع متكرران ══════
-     التبليط الكلاسيكي «نجمة وصليب»: نجمة ثمانية في مركز كل خلية،
-     ومربّع مائل بين كل أربع خلايا ⇒ الشبكة تبدو متشابكة لا مكرَّرة. */
+  /* ══════ ٣. زخرفة متشابكة ══════
+     التشابك الحقيقي: كل شريط يمرّ فوق وتحت جاره بالتناوب.
+     يُنفَّذ بحيلة الرسم المزدوج — يُرسم الشريط أولاً بخط أبيض عريض
+     (فيمحو ما تحته) ثم بحافتين سوداوين. ترتيب الرسم هو ما يقرّر
+     مَن فوق مَن، فلا حاجة لحساب التقاطعات. */
+  function bandPath(pts, closed) {
+    return "M" + pts.map(function (p) { return p[0].toFixed(2) + " " + p[1].toFixed(2); }).join(" L") +
+           (closed ? " Z" : "");
+  }
+  /* شريط واحد = ثلاث طبقات: أبيض عريض (المحو) + أسود أعرض قليلاً تحته (الحافة). */
+  function band(pts, w, closed) {
+    var d = bandPath(pts, closed);
+    return '<path d="' + d + '" fill="none" stroke="#111" stroke-width="' + (w + 0.9).toFixed(2) +
+             '" stroke-linejoin="round" stroke-linecap="round"/>' +
+           '<path d="' + d + '" fill="none" stroke="#fff" stroke-width="' + w.toFixed(2) +
+             '" stroke-linejoin="round" stroke-linecap="round"/>';
+  }
+
   function girih(seed, cells) {
-    var r = rng(seed), g = [], u = 100 / cells, gx, gy, i;
+    var r = rng(seed), u = 100 / cells, gx, gy, i;
     var n = [8, 12][Math.floor(r() * 2)];
-    var inner = n === 8 ? 0.414 : 0.268;      /* نسبة النجمة المنتظمة الحقيقية */
+    var inner = n === 8 ? 0.40 : 0.55;
+    var W = u * 0.16;                       /* عرض الشريط تبعاً لحجم الخلية */
+    var stars = [], links = [];
+
     for (gy = 0; gy < cells; gy++) for (gx = 0; gx < cells; gx++) {
-      var cx = (gx + 0.5) * u, cy = (gy + 0.5) * u, P = [];
+      var cx = (gx + 0.5) * u, cy = (gy + 0.5) * u, Ppts = [];
       for (i = 0; i < n * 2; i++) {
         var th = (i / (n * 2)) * PI2 - Math.PI / 2;
-        var rad = (i % 2 ? inner * 0.5 * u * 1.9 : 0.47 * u);
-        P.push([cx + rad * Math.cos(th), cy + rad * Math.sin(th)]);
+        var rad = (i % 2 ? inner * 0.47 * u * 2 : 0.46 * u);
+        Ppts.push([cx + rad * Math.cos(th), cy + rad * Math.sin(th)]);
       }
-      g.push(poly(P, 0.45, true));
-      /* المربّع المائل في التقاطع يربط أربع نجوم. */
+      stars.push(Ppts);
+      /* المعيّن الرابط عند كل تقاطع داخلي. */
+      /* الرابط يمتدّ حتى مراكز النجوم المجاورة ⇒ يتقاطع مع أشرطتها فعلاً.
+         بلا هذا التداخل يتلامس الشريطان ولا يظهر «فوق/تحت» إطلاقاً. */
       if (gx < cells - 1 && gy < cells - 1) {
-        var jx = (gx + 1) * u, jy = (gy + 1) * u, h = u * 0.19;
-        g.push(poly([[jx, jy - h], [jx + h, jy], [jx, jy + h], [jx - h, jy]], 0.45, true));
+        var jx = (gx + 1) * u, jy = (gy + 1) * u, h = u * 0.40;
+        links.push([[jx, jy - h], [jx + h, jy], [jx, jy + h], [jx - h, jy]]);
       }
     }
-    g.push('<rect x="0.4" y="0.4" width="99.2" height="99.2" fill="none" stroke="#111" stroke-width="0.8"/>');
+
+    /* الترتيب هو التشابك: يُرسم كل شريط بطبقة محو بيضاء تحت حافتيه،
+       فمن يُرسم لاحقاً يمرّ **فوق** من سبقه. إعادة رسم النجوم الزوجية
+       بعد الروابط تعطي التناوب: نجمة فوق رابط، ورابط فوق نجمة. */
+    var g = ['<rect width="100" height="100" fill="#fff"/>'];
+    stars.forEach(function (P, k) { if (k % 2) g.push(band(P, W, true)); });
+    links.forEach(function (P) { g.push(band(P, W, true)); });
+    stars.forEach(function (P, k) { if (k % 2 === 0) g.push(band(P, W, true)); });
+    g.push('<rect x="0.5" y="0.5" width="99" height="99" fill="none" stroke="#111" stroke-width="1"/>');
     return svg(g.join(""));
   }
 
