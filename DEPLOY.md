@@ -9,12 +9,13 @@
 | لا تُرفع | السبب |
 |---|---|
 | `DEPLOY.md` | تعليمات داخلية |
-| `PROJECT_MAP.md` · `CLAUDE.md` | ذاكرة تطوير |
+| `PROJECT_MAP.md` · `CLAUDE.md` · `ROADMAP.md` | ذاكرة تطوير |
 | `.git/` · `.gitignore` | تُستبعد تلقائياً |
 | `../.claude/launch.json` | خارج المجلد أصلاً |
 
-الملفات المنشورة: `index.html` · `404.html` · `robots.txt` · `sitemap.xml`
-· `favicon.ico` · `favicon.svg` · `apple-touch-icon.png` · `_headers` · `assets/`
+الملفات المنشورة: `index.html` (الرئيسية) · `math/` · `puzzles/` · `teacher/`
+· `404.html` · `robots.txt` · `sitemap.xml` · `favicon.ico` · `favicon.svg`
+· `apple-touch-icon.png` · `_headers` · `assets/`
 
 ## Cloudflare Pages (النطاق مُدار عندهم أصلاً ⇒ الأبسط)
 
@@ -34,8 +35,9 @@ curl -sI https://awraqna.com | head -1
 curl -s https://awraqna.com/robots.txt
 curl -sI https://awraqna.com/assets/generators.js | grep -i cache-control
 curl -sI https://awraqna.com/nope | head -1
+for p in "" math/ puzzles/ teacher/; do curl -s -o /dev/null -w "$p %{http_code}\n" https://awraqna.com/$p; done
 ```
-المتوقع: `200` · محتوى robots · `max-age=86400, must-revalidate` · `404`.
+المتوقع: `200` · محتوى robots · `max-age=86400, must-revalidate` · `404` · و`200` للمجالات الأربعة.
 
 ثم افتح الموقع واطبع ورقة فعلياً (Ctrl/Cmd+P) وتأكد من **صفحتين لا ثلاث**.
 

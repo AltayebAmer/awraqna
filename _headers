@@ -7,6 +7,7 @@
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+  Cache-Control: public, max-age=0, must-revalidate
 
 # ── التخزين المؤقت ────────────────────────────────────────────
 # المشروع بلا build step ⇒ لا بصمة hash في أسماء الملفات.
@@ -23,6 +24,5 @@
 /apple-touch-icon.png
   Cache-Control: public, max-age=31536000
 
-# الصفحة نفسها: تحقّق دائماً — هي نقطة الدخول الوحيدة.
-/
-  Cache-Control: public, max-age=0, must-revalidate
+# صفحات الأدوات ترث `must-revalidate` من /* أعلاه ⇒ أي مجال جديد
+# يُضاف لاحقاً يحصل على السلوك الصحيح تلقائياً بلا تعديل هنا.
