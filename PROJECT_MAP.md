@@ -1,0 +1,114 @@
+# PROJECT_MAP — أوراقنا | awraqna.com
+
+> الذاكرة الخارجية للمشروع. اقرأه قبل أي تعديل، وحدّث `[ORPHANS & PENDING]` بعد كل مرحلة.
+> آخر تحديث: 2026-08-22
+
+---
+
+## [TECH_STACK]
+
+| الطبقة | الاختيار | الإصدار | السبب |
+|---|---|---|---|
+| Runtime | متصفح فقط | — | بلا خادم، بلا تكاليف تشغيل |
+| Build | **لا شيء** | — | ملفات ثابتة تُفتح مباشرة |
+| تبعيات | **صفر** | — | لا npm، لا CDN، لا مكتبة PDF |
+| الخطوط | خطوط نظام | — | `system-ui`, `SF Arabic`, `Geeza Pro` — لا تحميل خارجي |
+| PDF | `@media print` أصلي | — | المتصفح هو محرك الطباعة |
+| RNG | `mulberry32` مكتوب يدوياً | — | seed صريح ⇒ «إعادة توليد» = `seed++` |
+| اختبار | `node -e` على `generators.js` | node ≥ 18 (النظام) | غير مُضمَّن في المشروع، للتطوير فقط |
+| خادم محلي | `python3 -m http.server` | مثبّت مع macOS | تطوير فقط |
+| الاستضافة | Cloudflare Pages | — | النطاق مُشترى من Cloudflare Registrar |
+
+**أسرار:** لا يوجد أي سر في المشروع ⇒ لا `.env`. `.gitignore` موجود من البداية.
+
+---
+
+## [SYSTEM_FLOW]
+
+```
+UI (select / buttons)
+      │ change
+      ▼
+state = { grade, skill, difficulty, count, seed }
+      │
+      ▼
+generators.generate(skill, state)      ← rng = mulberry32(seed)
+      │  ×count · رفض المكرر · قيود الصعوبة
+      ▼
+questions[] = [{ a, op, b, answer }]   ← مصدر الحقيقة الوحيد
+      │
+      ├──► renderSheet()   → #sheet    (سؤال + فراغ حل)
+      └──► renderAnswers() → #answers  (نفس المصفوفة + الحل)
+                                        ⇒ التطابق صحيح بالبناء لا بالاختبار
+```
+
+**رحلة المستخدم (٣ نقرات كحد أقصى):**
+`فتح الموقع (ورقة جاهزة سلفاً — 0 نقرة)` → `تغيير المهارة` → `تغيير الصعوبة` → `طباعة`
+الطباعة المباشرة بلا تعديل = **نقرة واحدة**.
+
+---
+
+## [ARCHITECTURE]
+
+```
+awraqna/
+├── index.html          الواجهة + الورقة + صفحة الإجابات
+├── assets/
+│   ├── brand.css       نظام تصميم 007 (منسوخ) — الشاشة فقط
+│   ├── sheet.css       ★ الورقة + @media print — الطبقة المطبوعة الوحيدة
+│   ├── generators.js   ★ منطق رياضي نقي — ممنوع DOM
+│   ├── app.js          state · render · i18n · print
+│   └── ads.js          منسوخ من 007 كما هو + awraqna في HOUSE[]
+├── .gitignore
+├── CLAUDE.md
+└── PROJECT_MAP.md
+```
+
+### قرارات محسومة — لا يُعاد فتحها
+1. **صفحة واحدة.** لا صفحة تسويقية وسيطة — تكسر معيار ٣ النقرات.
+2. **`generators.js` نقي ومنفصل.** قاعدة الـ٣ مرات محقّقة سلفاً: الضرب يُستخدَم في
+   المرحلة ١ + جدول الضرب (م٢) + ورقة امتحان (م٢).
+3. **seed صريح.** لا `Math.random()` مباشرة. الـ seed يُعرض على الورقة ⇒ معيار «توليدان مختلفان» قابل للبرهنة.
+4. **الإجابات مشتقّة من `questions[]`**، لا مولّدة ثانية.
+5. **الصف مستقل عن المهارة.** الصف يضبط مدى الأرقام فقط؛ لا جدول مناهج
+   (القرار (أ) — المناهج العربية تختلف، وإخفاء الخيارات يكسر ٣ النقرات).
+6. **إخفاء الطباعة بالإقصاء** `body > *:not(#print-root)` ⇒ أي إعلان جديد يختفي بلا صيانة.
+
+### عقد `generators.js` — مثبَّت
+```
+generate(skill, { grade, difficulty, count, seed }) → Question[]
+skill      : 'add' | 'sub' | 'mul'
+difficulty : 'easy' | 'med' | 'hard'
+Question   : { a:int, op:'+'|'−'|'×', b:int, answer:int }
+```
+قيود داخلية: لا ناتج سالب في الصفوف ١–٤ · لا مكرر في الورقة الواحدة ·
+لا `a×1` ولا `a+0` في مستوى `hard`.
+
+### نطاق مرفوض عمداً
+بنك أسئلة يدوي · ملفات صوت · حسابات/مزامنة · مكتبة PDF · Service Worker (م١) ·
+`guardian.js` (خارج نطاق م١) · أي مهارة رابعة قبل الإطلاق.
+
+---
+
+## [ORPHANS & PENDING]
+
+### مُنجَز
+- [x] **M0** — الهيكل: مجلد، `.gitignore`، `CLAUDE.md`، `PROJECT_MAP.md`،
+      نسخ `brand.css` و `ads.js` من 007.
+
+### معلّق
+- [ ] **M1** — `generators.js` (add/sub/mul + mulberry32).
+      نجاح: `node -e` يطبع `count: 20` / `valid: true` / `no-dup: true` / `differs: true` / `no-negative: true`
+- [ ] **M2** — `index.html` + `app.js`: معاينة حية، إعادة توليد، مبدّل AR/EN.
+      نجاح: `python3 -m http.server 8080` + لقطتان لنفس الإعدادات بأسئلة و seed مختلفين
+- [ ] **M3** — `sheet.css` والطباعة (الأخطر).
+      نجاح: Chrome Print Preview يعرض `1 / 2` لـ٢٠ سؤالاً، صفر عنصر واجهة، لا سؤال منقسم
+- [ ] **M4** — RTL/EN و 360px.
+      نجاح: `scrollWidth === clientWidth` → `true` في `ar` و `en`
+- [ ] **M5** — `awraqna` في `HOUSE[]` بالمشروعين + نشر.
+      نجاح: `curl -sI https://awraqna.com | head -1` → `HTTP/2 200`
+
+### أيتام معروفة
+- `assets/ads.js` منسوخ كما هو ويحوي `HOUSE[]` بمشاريع 007 — **لم يُضَف `awraqna` بعد** (M5).
+- `assets/brand.css` منسوخ بألوان 007 الذهبية — قد تُعدَّل هوية أوراقنا لاحقاً؛
+  لا تُحذف متغيرات CSS منه، `ads.js` يعتمد على `--line` و `--bg-2`.

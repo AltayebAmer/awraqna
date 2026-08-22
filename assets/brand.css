@@ -1,0 +1,131 @@
+/* ════════════════════════════════════════════════════════════
+   007.gallery — © 2026 Artist Altayeb Amer / الفنان الطيب عامر
+   Source : https://007.gallery
+   Protected by ALTAYEB GUARDIAN v4.0 — do not remove this notice.
+   ════════════════════════════════════════════════════════════ */
+/* ============================================================
+   007.gallery — نظام التصميم المشترك (Brand System)
+   فخامة وأناقة مع بساطة — Class, elegance & simplicity
+   ============================================================ */
+:root{
+  --bg:#0a0b0f; --bg-2:#12141c; --card:#161a24; --card-2:#1b2130;
+  --line:#232a3a; --line-2:#2e3750;
+  --gold:#d4af37; --gold-2:#f2d16b; --gold-soft:rgba(212,175,55,.12);
+  --txt:#eef1f7; --txt-dim:#9aa4b8; --txt-mute:#6b7488;
+  --green:#37d49a; --blue:#5b8cff; --red:#ff6b6b;
+  --radius:16px; --radius-sm:11px; --maxw:1120px;
+  --ff:'Segoe UI',system-ui,-apple-system,'SF Arabic','Geeza Pro','Helvetica Neue',Arial,sans-serif;
+  --shadow:0 10px 40px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  font-family:var(--ff);background:var(--bg);color:var(--txt);line-height:1.6;
+  min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(900px 500px at 85% -10%, rgba(212,175,55,.10), transparent 60%),
+    radial-gradient(700px 500px at 0% 0%, rgba(91,140,255,.07), transparent 55%);
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+
+/* ---------- Header ---------- */
+.site-header{
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+  background:rgba(10,11,15,.72);border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px;min-width:0}
+.nav .brand{min-width:0;flex-shrink:1}
+.nav-actions{flex-shrink:0}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:19px;letter-spacing:.3px}
+.brand .logo{
+  width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0b0f;
+  font-weight:900;font-size:14px;box-shadow:0 4px 18px rgba(212,175,55,.35)
+}
+.brand b{color:var(--gold)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+
+/* ---------- Buttons ---------- */
+.btn{
+  border:1px solid var(--line-2);background:var(--card);color:var(--txt);
+  padding:10px 17px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;
+  cursor:pointer;transition:.18s;font-family:inherit;display:inline-flex;align-items:center;gap:8px
+}
+.btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold-2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0b0f;border:none}
+.btn-primary:hover:not(:disabled){filter:brightness(1.07);color:#0a0b0f}
+.btn-lg{padding:14px 26px;font-size:16px;border-radius:14px}
+.btn-ghost{background:transparent}
+.btn-lang{min-width:52px;justify-content:center}
+
+/* ---------- Cards ---------- */
+.panel{
+  background:linear-gradient(180deg,var(--card),var(--card-2));
+  border:1px solid var(--line);border-radius:var(--radius);padding:22px;
+}
+
+/* ---------- Form controls ---------- */
+label{display:block;font-size:13px;color:var(--txt-dim);margin-bottom:8px;font-weight:600}
+label b{color:var(--gold-2)}
+select,input[type=number],input[type=text]{
+  width:100%;padding:11px 13px;border:1px solid var(--line-2);border-radius:var(--radius-sm);
+  background:var(--bg-2);color:var(--txt);font:inherit;font-size:14px;transition:.15s
+}
+select:focus,input:focus{outline:none;border-color:var(--gold)}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.check{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--txt);cursor:pointer}
+.check input{accent-color:var(--gold);width:17px;height:17px}
+
+/* ---------- Segmented control (format picker) ---------- */
+.seg{display:inline-flex;background:var(--bg-2);border:1px solid var(--line-2);border-radius:12px;padding:4px;gap:4px}
+.seg button{
+  border:none;background:transparent;color:var(--txt-dim);font:inherit;font-weight:700;font-size:14px;
+  padding:9px 18px;border-radius:9px;cursor:pointer;transition:.15s
+}
+.seg button.on{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0b0f}
+
+/* ---------- Footer ---------- */
+.site-footer{border-top:1px solid var(--line);margin-top:50px;padding:34px 0}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.foot p{color:var(--txt-mute);font-size:13px}
+
+/* ---------- Bilingual visibility ---------- */
+[data-en]{display:none}
+html[lang=en] [data-ar]{display:none}
+html[lang=en] [data-en]{display:inline}
+html[lang=en] .block-ar{display:none}
+.block-en{display:none}
+html[lang=en] .block-en{display:block}
+
+/* ---------- Utilities ---------- */
+.pill{
+  display:inline-flex;align-items:center;gap:8px;background:var(--gold-soft);
+  border:1px solid rgba(212,175,55,.3);color:var(--gold-2);
+  padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700
+}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.muted{color:var(--txt-mute)}
+
+/* ---------- الشاشات الضيقة جداً (360px وأقل) ---------- */
+@media (max-width:520px){
+  .nav{gap:8px;height:58px}
+  .brand{font-size:15.5px;gap:8px}
+  .brand .logo{width:31px;height:31px;font-size:11.5px;border-radius:9px}
+  .nav-actions{gap:6px}
+  .nav-actions .btn{padding:9px 11px;font-size:12.5px;min-height:40px}
+  .btn-lang{min-width:40px}
+  .nav-cta-hide{display:none}     /* زر الدعوة — موجود في المحتوى */
+  .wrap{padding:0 16px}
+}
+
+/* ---------- Mobile touch targets ---------- */
+@media (max-width:768px){
+  .nav-sm-hide{display:none}        /* روابط ثانوية تُخفى على الجوال (موجودة في التذييل) */
+  .btn{min-height:44px;padding:11px 16px}
+  .btn-lang{min-width:48px}
+  .seg button{min-height:42px}
+  input[type=color]{min-height:38px}
+  .nav{height:60px}
+}
