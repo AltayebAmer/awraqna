@@ -95,10 +95,11 @@ Question   : { a:int, op:'+'|'−'|'×', b:int, answer:int }
 ### مُنجَز
 - [x] **M0** — الهيكل: مجلد، `.gitignore`، `CLAUDE.md`، `PROJECT_MAP.md`،
       نسخ `brand.css` و `ads.js` من 007.
+- [x] **M1** — `assets/generators.js` (add/sub/mul + mulberry32 + عقد `generate`).
+      مُتحقَّق: مسح شامل ٥٤ تركيبة (٣ مهارات × ٦ صفوف × ٣ صعوبات) → صفر فشل حسابي،
+      صفر ناتج سالب في الصفوف ١–٤، عدد الأسئلة مضمون ٣٠/٣٠ في كل تركيبة.
 
 ### معلّق
-- [ ] **M1** — `generators.js` (add/sub/mul + mulberry32).
-      نجاح: `node -e` يطبع `count: 20` / `valid: true` / `no-dup: true` / `differs: true` / `no-negative: true`
 - [ ] **M2** — `index.html` + `app.js`: معاينة حية، إعادة توليد، مبدّل AR/EN.
       نجاح: `python3 -m http.server 8080` + لقطتان لنفس الإعدادات بأسئلة و seed مختلفين
 - [ ] **M3** — `sheet.css` والطباعة (الأخطر).
@@ -109,6 +110,10 @@ Question   : { a:int, op:'+'|'−'|'×', b:int, answer:int }
       نجاح: `curl -sI https://awraqna.com | head -1` → `HTTP/2 200`
 
 ### أيتام معروفة
+- **الفضاء الضيّق:** ٥ تركيبات (ضرب/طرح · صف ١–٢ · سهل) فضاؤها العددي أصغر من ٣٠ سؤالاً
+  فعلياً ⇒ `generate` يسمح بالتكرار كملاذ أخير ويسجّل `console.warn`.
+  هذا سلوك صحيح لا عيب: ورقة ناقصة أسوأ من ورقة بها تكرار. لا تُصلحه بتوسيع المدى
+  فتكسر ملاءمة الصف.
 - `assets/ads.js` منسوخ كما هو ويحوي `HOUSE[]` بمشاريع 007 — **لم يُضَف `awraqna` بعد** (M5).
 - `assets/brand.css` منسوخ بألوان 007 الذهبية — قد تُعدَّل هوية أوراقنا لاحقاً؛
   لا تُحذف متغيرات CSS منه، `ads.js` يعتمد على `--line` و `--bg-2`.
