@@ -247,7 +247,8 @@
 
 /* ---------- ورقة الزخرفة ---------- */
 .rp-wrap{display:flex;justify-content:center;align-items:center}
-.rp-svg{display:block;width:100%;max-width:186mm;height:auto;max-height:238mm}
+/* اللوحة صارت بنسبة الورقة ⇒ العرض الكامل يعطي ارتفاع 253mm تلقائياً. */
+.rp-svg{display:block;width:100%;max-width:186mm;height:auto;max-height:253mm}
 .rp-grid{display:grid;gap:6px}
 .rp-grid[data-per="4"]{grid-template-columns:1fr 1fr}
 .rp-grid[data-per="8"]{grid-template-columns:1fr 1fr}

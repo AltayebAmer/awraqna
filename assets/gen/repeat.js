@@ -28,6 +28,10 @@
      يتشاركان المعرّف، فيلتقط `<use>` أوّلهما ويظهر الرسمان متطابقين. */
   var uid = 0;
 
+  /* لوحة الرسم بنسبة مساحة الطباعة (186×253 مم) لا مربّعة.
+     اللوحة المربّعة كانت تترك ثلث الورقة فارغاً — شوهد على الورق. */
+  var CW = 400, CH = 545, CX = 200, CY = 272;
+
   /* ══════ العناصر السبعة ══════
      كل عنصر مرسوم داخل مربّع 100×100 مركزه (50,50)، ويقبل معاملات
      من العشوائية فيختلف شكله بين توليد وآخر دون أن يتغيّر نوعه. */
@@ -401,8 +405,8 @@
     var out = [], i, off = radius;
     for (i = 0; i < count; i++) {
       var a = (i / count) * 360 + spin;
-      out.push('<use href="#' + id + '" transform="rotate(' + f2(a) + ' 200 200) ' +
-               'translate(0 ' + f2(-off) + ') translate(200 200) scale(' + f2(scale) + ') translate(-50 -50)"/>');
+      out.push('<use href="#' + id + '" transform="rotate(' + f2(a) + " " + CX + " " + CY + ') ' +
+               'translate(0 ' + f2(-off) + ') translate(' + CX + " " + CY + ') scale(' + f2(scale) + ') translate(-50 -50)"/>');
     }
     return out.join("");
   }
@@ -411,7 +415,7 @@
     var out = [], x, y;
     var w = (cols - 1) * gapX, h = (rows - 1) * gapY;
     for (y = 0; y < rows; y++) for (x = 0; x < cols; x++) {
-      var cx = 200 - w / 2 + x * gapX, cy = 200 - h / 2 + y * gapY;
+      var cx = CX - w / 2 + x * gapX, cy = CY - h / 2 + y * gapY;
       out.push('<use href="#' + id + '" transform="translate(' + f2(cx) + ' ' + f2(cy) +
                ') scale(' + f2(scale) + ') translate(-50 -50)"/>');
     }
@@ -424,11 +428,11 @@
     var out = [], i;
     for (i = 0; i < axes; i++) {
       var a = (i / axes) * 180;
-      out.push('<use href="#' + id + '" transform="rotate(' + f2(a) + ' 200 200) ' +
-               'translate(200 200) translate(' + f2(offset) + ' 0) scale(' + f2(scale) +
+      out.push('<use href="#' + id + '" transform="rotate(' + f2(a) + " " + CX + " " + CY + ') ' +
+               'translate(' + CX + " " + CY + ') translate(' + f2(offset) + ' 0) scale(' + f2(scale) +
                ') translate(-50 -50)"/>');
-      out.push('<use href="#' + id + '" transform="rotate(' + f2(a) + ' 200 200) ' +
-               'translate(200 200) translate(' + f2(-offset) + ' 0) scale(' + f2(-scale) + ' ' + f2(scale) +
+      out.push('<use href="#' + id + '" transform="rotate(' + f2(a) + " " + CX + " " + CY + ') ' +
+               'translate(' + CX + " " + CY + ') translate(' + f2(-offset) + ' 0) scale(' + f2(-scale) + ' ' + f2(scale) +
                ') translate(-50 -50)"/>');
     }
     return out.join("");
@@ -456,7 +460,9 @@
 
     if (state.mode === "grid") {
       var cols = state.cols || 5, rowsN = state.rows || 6;
-      var gap = 340 / Math.max(cols, rowsN);
+      /* تباعد منتظم يملأ أكبر قدر من اللوحة دون تشويه: أصغر ما يسع
+         الأعمدة والصفوف معاً. */
+      var gap = Math.min((CW - 46) / Math.max(1, cols - 0.15), (CH - 46) / Math.max(1, rowsN - 0.15));
       var scale = (gap * (state.size || 100) / 100) / 100;
       body = grid(id, cols, rowsN, gap, gap, scale);
     } else if (state.mode === "mirror") {
@@ -466,17 +472,18 @@
       /* خطوط التناظر تُرسم منقّطة لتُظهر بنية التصميم للمصمّم. */
       for (var i = 0; i < axes; i++) {
         var a = (i / axes) * 180;
-        guides += '<line x1="200" y1="10" x2="200" y2="390" stroke="#c9c9c9" stroke-width="0.6" ' +
-                  'stroke-dasharray="4 4" transform="rotate(' + f2(a) + ' 200 200)"/>';
+        guides += '<line x1="' + CX + '" y1="' + f2(CY - 250) + '" x2="' + CX + '" y2="' + f2(CY + 250) +
+                  '" stroke="#c9c9c9" stroke-width="0.6" stroke-dasharray="4 4" ' +
+                  'transform="rotate(' + f2(a) + " " + CX + " " + CY + ')"/>';
       }
     } else {
       var cnt = state.count || 12;
       body = radial(id, cnt, state.radius || 110, state.spin || 0, (state.size || 100) / 100 * 0.95);
     }
 
-    return '<svg class="rp-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" ' +
+    return '<svg class="rp-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + CW + " " + CH + '" ' +
            'preserveAspectRatio="xMidYMid meet">' +
-           '<rect width="400" height="400" fill="#fff"/>' +
+           '<rect width="' + CW + '" height="' + CH + '" fill="#fff"/>' +
            '<defs><path id="' + id + '" d="' + d + '" fill="' + fillOf(kind, state) +
            '" stroke="#111" stroke-width="' + sw + '" stroke-linejoin="round"/></defs>' + guides + body + "</svg>";
   }
