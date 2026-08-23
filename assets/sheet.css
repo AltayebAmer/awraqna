@@ -228,6 +228,12 @@
 /* ---------- ورقة الزخرفة ---------- */
 .rp-wrap{display:flex;justify-content:center;align-items:center}
 .rp-svg{display:block;width:100%;max-width:186mm;height:auto;max-height:238mm}
+.rp-grid{display:grid;gap:6px}
+.rp-grid[data-per="4"]{grid-template-columns:1fr 1fr}
+.rp-grid[data-per="8"]{grid-template-columns:1fr 1fr}
+.rp-cell{border:1px dashed #ddd;border-radius:6px;padding:3px;min-width:0;
+  break-inside:avoid;page-break-inside:avoid}
+.rp-cell .rp-svg{max-width:none;max-height:none}
 
 /* ---------- سطر النسبة على الورق ---------- */
 .sheet-credit{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
@@ -296,6 +302,13 @@
   .puz-n{background:none;border:1px solid #999;color:#000}
   /* الشكل مربّع فلا يملأ ارتفاع A4 — يُتوسَّط رأسياً فيبدو مقصوداً لا ناقصاً. */
   .art-wrap,.rp-wrap,.dw-solo{min-height:232mm;align-items:center}
+  /* الارتفاع يُثبَّت رقمياً لكل تخطيط: `1fr` وحدها لا تكفي لأن الـSVG
+     يحتفظ بنسبته المربّعة فيتمدّد خارج الصف — ثماني زخارف صارت صفحتين. */
+  .rp-grid{grid-auto-rows:auto}
+  .rp-cell{border-color:#e5e5e5;display:flex;align-items:center;justify-content:center}
+  .rp-cell .rp-svg{width:auto;max-width:100%}
+  .rp-grid[data-per="4"] .rp-svg{height:110mm}
+  .rp-grid[data-per="8"] .rp-svg{height:54mm}
   .dw-old{stroke:#b5b5b5}
   .dw-cell{border-color:#d8d8d8}
   /* تُمَطّ الشبكة لتملأ الورقة: بدونها بقي ثلث الصفحة فارغاً والرسم صغيراً. */

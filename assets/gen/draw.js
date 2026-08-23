@@ -126,28 +126,31 @@
   } };
 
   ANIMALS.elephant = { ar: "فيل", en: "Elephant", build: function (r) {
-    var bw = 26 + r() * 4, bh = 20 + r() * 3, bx = 56, by = 48;
-    var hr = 15 + r() * 2, hx = bx - bw * .95, hy = by - bh * .2;
+    var bw = 24 + r() * 3, bh = 19 + r() * 2, bx = 60, by = 50;
+    var hr = 14 + r() * 1.5, hx = bx - bw * 1.05, hy = by - bh * .18;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
     return [
       [E(bx, by, bw, bh)],                                                /* الجسم */
-      [C(hx, hy, hr)],                                                    /* الرأس */
-      [P("M" + n2(hx - hr * .75) + " " + n2(hy + hr * .35) + " C" + n2(hx - hr * 1.7) + " " + n2(hy + hr * 1.3) +
-          " " + n2(hx - hr * 1.2) + " " + n2(hy + hr * 2.4) + " " + n2(hx - hr * 1.85) + " " + n2(hy + hr * 2.6))], /* الخرطوم */
-      [P("M" + n2(hx + hr * .25) + " " + n2(hy - hr * .85) + " C" + n2(hx + hr * 1.5) + " " + n2(hy - hr * 1.2) +
-          " " + n2(hx + hr * 1.6) + " " + n2(hy + hr * .8) + " " + n2(hx + hr * .35) + " " + n2(hy + hr * .75) + " Z"),
-       C(hx - hr * .3, hy - hr * .12, 1.6)],                              /* الأذن والعين */
-      [L([[bx - bw * .6, by + bh * .85], [bx - bw * .62, by + bh * 1.75]]),
-       L([[bx - bw * .18, by + bh * .95], [bx - bw * .2, by + bh * 1.75]]),
-       L([[bx + bw * .35, by + bh * .92], [bx + bw * .38, by + bh * 1.75]]),
-       L([[bx + bw * .72, by + bh * .78], [bx + bw * .75, by + bh * 1.75]])], /* القوائم */
-      [P("M" + n2(bx + bw * .95) + " " + n2(by - bh * .35) + " C" + n2(bx + bw * 1.35) + " " + n2(by - bh * .1) +
-          " " + n2(bx + bw * 1.3) + " " + n2(by + bh * .5) + " " + n2(bx + bw * 1.1) + " " + n2(by + bh * .6))] /* الذيل */
+      [C(hx, hy, hr)],                                                    /* الرأس ملامس للجسم */
+      /* الخرطوم يخرج من أسفل الرأس وينحدر ثم يلتفّ — لا من منتصفه. */
+      [P("M" + e(hx - hr * .55, hy + hr * .78) + " C" + e(hx - hr * 1.35, hy + hr * 1.85) +
+          " " + e(hx - hr * .35, hy + hr * 2.65) + " " + e(hx - hr * 1.05, hy + hr * 3.0))],
+      [E(hx + hr * .42, hy - hr * .30, hr * .55, hr * .70, -14),          /* الأذن أعلى الرأس */
+       C(hx - hr * .38, hy - hr * .25, 1.5)],                             /* العين */
+      [L([[hx - hr * .82, hy + hr * 1.05], [hx - hr * 1.3, hy + hr * 1.55]]),
+       L([[hx - hr * .28, hy + hr * 1.15], [hx - hr * .05, hy + hr * 1.75]])], /* النابان */
+      [L([[bx - bw * .58, by + bh * .88], [bx - bw * .6, by + bh * 1.78]]),
+       L([[bx - bw * .16, by + bh * .97], [bx - bw * .18, by + bh * 1.78]]),
+       L([[bx + bw * .36, by + bh * .94], [bx + bw * .38, by + bh * 1.78]]),
+       L([[bx + bw * .74, by + bh * .76], [bx + bw * .76, by + bh * 1.78]]),
+       P("M" + e(bx + bw * .96, by - bh * .32) + " C" + e(bx + bw * 1.32, by - bh * .05) +
+          " " + e(bx + bw * 1.28, by + bh * .55) + " " + e(bx + bw * 1.08, by + bh * .62))]
     ];
   } };
 
   ANIMALS.rabbit = { ar: "أرنب", en: "Rabbit", build: function (r) {
-    var bw = 19 + r() * 3, bh = 18 + r() * 2, bx = 56, by = 68;
-    var hr = 12 + r() * 1.5, hx = 40, hy = 38;
+    var bw = 19 + r() * 3, bh = 17 + r() * 2, bx = 56, by = 70;
+    var hr = 13 + r() * 1.5, hx = 45, hy = 43;
     var e = function (a, b) { return n2(a) + " " + n2(b); };
     return [
       [E(bx, by, bw, bh)],
@@ -207,7 +210,143 @@
     ];
   } };
 
-  var ORDER = ["cat", "chick", "duck", "fish", "rabbit", "turtle", "elephant"];
+
+  ANIMALS.butterfly = { ar: "فراشة", en: "Butterfly", build: function (r) {
+    var cx = 50, cy = 52, w = 20 + r() * 4, h = 22 + r() * 4;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
+    return [
+      [E(cx, cy, 3.2, h * .82)],                                          /* الجسم */
+      [C(cx, cy - h * .95, 4.2),
+       P("M" + e(cx - 1.5, cy - h * 1.28) + " C" + e(cx - 8, cy - h * 1.85) + " " + e(cx - 11, cy - h * 1.5) + " " + e(cx - 12, cy - h * 1.72)),
+       P("M" + e(cx + 1.5, cy - h * 1.28) + " C" + e(cx + 8, cy - h * 1.85) + " " + e(cx + 11, cy - h * 1.5) + " " + e(cx + 12, cy - h * 1.72))],
+      [P("M" + e(cx - 3, cy - h * .55) + " C" + e(cx - w * 1.75, cy - h * 1.35) + " " + e(cx - w * 1.85, cy - h * .1) + " " + e(cx - 3, cy - h * .05) + " Z"),
+       P("M" + e(cx + 3, cy - h * .55) + " C" + e(cx + w * 1.75, cy - h * 1.35) + " " + e(cx + w * 1.85, cy - h * .1) + " " + e(cx + 3, cy - h * .05) + " Z")],
+      [P("M" + e(cx - 3, cy + h * .1) + " C" + e(cx - w * 1.4, cy + h * .35) + " " + e(cx - w * 1.15, cy + h * 1.15) + " " + e(cx - 3, cy + h * .72) + " Z"),
+       P("M" + e(cx + 3, cy + h * .1) + " C" + e(cx + w * 1.4, cy + h * .35) + " " + e(cx + w * 1.15, cy + h * 1.15) + " " + e(cx + 3, cy + h * .72) + " Z")],
+      [C(cx - w * .95, cy - h * .5, 3.4), C(cx + w * .95, cy - h * .5, 3.4),
+       C(cx - w * .72, cy + h * .55, 2.2), C(cx + w * .72, cy + h * .55, 2.2)]
+    ];
+  } };
+
+  ANIMALS.owl = { ar: "بومة", en: "Owl", build: function (r) {
+    var bw = 22 + r() * 3, bh = 27 + r() * 3, cx = 50, cy = 55;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
+    return [
+      [P("M" + e(cx - bw, cy + bh * .35) + " C" + e(cx - bw * 1.15, cy - bh * .95) + " " + e(cx + bw * 1.15, cy - bh * .95) + " " + e(cx + bw, cy + bh * .35) +
+          " C" + e(cx + bw * .85, cy + bh * 1.05) + " " + e(cx - bw * .85, cy + bh * 1.05) + " " + e(cx - bw, cy + bh * .35) + " Z")],
+      [P("M" + e(cx - bw * .82, cy - bh * .52) + " L" + e(cx - bw * .95, cy - bh * 1.02) + " L" + e(cx - bw * .38, cy - bh * .72)),
+       P("M" + e(cx + bw * .82, cy - bh * .52) + " L" + e(cx + bw * .95, cy - bh * 1.02) + " L" + e(cx + bw * .38, cy - bh * .72))],
+      [C(cx - bw * .42, cy - bh * .38, bw * .34), C(cx + bw * .42, cy - bh * .38, bw * .34),
+       C(cx - bw * .42, cy - bh * .38, bw * .13), C(cx + bw * .42, cy - bh * .38, bw * .13)],
+      [P("M" + e(cx, cy - bh * .28) + " L" + e(cx - bw * .13, cy - bh * .02) + " L" + e(cx + bw * .13, cy - bh * .02) + " Z"),
+       P("M" + e(cx - bw * .88, cy - bh * .1) + " C" + e(cx - bw * .7, cy + bh * .55) + " " + e(cx - bw * .55, cy + bh * .8) + " " + e(cx - bw * .42, cy + bh * .88)),
+       P("M" + e(cx + bw * .88, cy - bh * .1) + " C" + e(cx + bw * .7, cy + bh * .55) + " " + e(cx + bw * .55, cy + bh * .8) + " " + e(cx + bw * .42, cy + bh * .88))],
+      [L([[cx - bw * .38, cy + bh * 1.0], [cx - bw * .38, cy + bh * 1.22]]),
+       L([[cx + bw * .38, cy + bh * 1.0], [cx + bw * .38, cy + bh * 1.22]]),
+       L([[cx - bw * .62, cy + bh * 1.22], [cx - bw * .14, cy + bh * 1.22]]),
+       L([[cx + bw * .14, cy + bh * 1.22], [cx + bw * .62, cy + bh * 1.22]])]
+    ];
+  } };
+
+  ANIMALS.snail = { ar: "حلزون", en: "Snail", build: function (r) {
+    var sr = 19 + r() * 3, sx = 58, sy = 46;
+    var bx = 30, by = 70;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
+    var spiral = "M" + e(sx, sy);
+    var i, a, rr;
+    for (i = 0; i <= 46; i++) { a = i / 46 * Math.PI * 5.2; rr = sr * (i / 46); spiral += " L" + e(sx + rr * Math.cos(a), sy + rr * Math.sin(a)); }
+    return [
+      [C(sx, sy, sr)],                                                    /* الصدفة */
+      [P("M" + e(sx - sr, sy + sr * .55) + " C" + e(bx - 18, by - 2) + " " + e(bx - 20, by + 8) + " " + e(bx - 4, by + 8) +
+          " L" + e(sx + sr * .55, by + 8) + " C" + e(sx + sr * .95, by + 4) + " " + e(sx + sr, sy + sr * .95) + " " + e(sx + sr * .72, sy + sr * .72))], /* الجسم */
+      [P(spiral)],                                                        /* دوّامة الصدفة */
+      [L([[bx - 15, by - 1], [bx - 20, by - 14]]), L([[bx - 8, by - 3], [bx - 8, by - 16]]),
+       C(bx - 20.5, by - 16, 2.1), C(bx - 8, by - 18, 2.1)],              /* قرنا الاستشعار */
+      [C(bx - 14, by + 1, 1.4),
+       L([[bx - 2, by + 8], [sx + sr * .5, by + 8]])]                     /* العين وخط القاعدة */
+    ];
+  } };
+
+  ANIMALS.frog = { ar: "ضفدع", en: "Frog", build: function (r) {
+    var bw = 22 + r() * 3, bh = 17 + r() * 3, cx = 50, cy = 62;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
+    return [
+      [E(cx, cy, bw, bh)],                                                /* الجسم */
+      [C(cx - bw * .46, cy - bh * .92, bw * .3), C(cx + bw * .46, cy - bh * .92, bw * .3)], /* العينان */
+      [C(cx - bw * .46, cy - bh * .92, bw * .12), C(cx + bw * .46, cy - bh * .92, bw * .12),
+       P("M" + e(cx - bw * .5, cy + bh * .28) + " C" + e(cx - bw * .2, cy + bh * .62) + " " + e(cx + bw * .2, cy + bh * .62) + " " + e(cx + bw * .5, cy + bh * .28))], /* البؤبؤ والفم */
+      [P("M" + e(cx - bw * .82, cy + bh * .35) + " C" + e(cx - bw * 1.5, cy + bh * .5) + " " + e(cx - bw * 1.45, cy + bh * 1.15) + " " + e(cx - bw * .78, cy + bh * 1.0)),
+       P("M" + e(cx + bw * .82, cy + bh * .35) + " C" + e(cx + bw * 1.5, cy + bh * .5) + " " + e(cx + bw * 1.45, cy + bh * 1.15) + " " + e(cx + bw * .78, cy + bh * 1.0))], /* الساقان */
+      [L([[cx - bw * 1.42, cy + bh * 1.05], [cx - bw * 1.62, cy + bh * 1.05]]),
+       L([[cx - bw * 1.42, cy + bh * 1.05], [cx - bw * 1.58, cy + bh * .88]]),
+       L([[cx + bw * 1.42, cy + bh * 1.05], [cx + bw * 1.62, cy + bh * 1.05]]),
+       L([[cx + bw * 1.42, cy + bh * 1.05], [cx + bw * 1.58, cy + bh * .88]])] /* الأصابع */
+    ];
+  } };
+
+  ANIMALS.bee = { ar: "نحلة", en: "Bee", build: function (r) {
+    var bw = 21 + r() * 3, bh = 15 + r() * 2, cx = 52, cy = 56;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
+    return [
+      [E(cx, cy, bw, bh)],                                                /* الجسم */
+      [C(cx - bw * .98, cy - bh * .18, bh * .68)],                        /* الرأس */
+      [P("M" + e(cx - bw * .2, cy - bh) + " C" + e(cx - bw * .15, cy - bh * 2.4) + " " + e(cx + bw * .75, cy - bh * 2.3) + " " + e(cx + bw * .5, cy - bh * .82) + " Z"),
+       P("M" + e(cx - bw * .05, cy - bh * .95) + " C" + e(cx + bw * .3, cy - bh * 2.1) + " " + e(cx + bw * 1.05, cy - bh * 1.7) + " " + e(cx + bw * .68, cy - bh * .7) + " Z")], /* الجناحان */
+      [P("M" + e(cx - bw * .28, cy - bh * .96) + " C" + e(cx - bw * .38, cy) + " " + e(cx - bw * .38, cy) + " " + e(cx - bw * .28, cy + bh * .96)),
+       P("M" + e(cx + bw * .18, cy - bh * .97) + " C" + e(cx + bw * .08, cy) + " " + e(cx + bw * .08, cy) + " " + e(cx + bw * .18, cy + bh * .97)),
+       P("M" + e(cx + bw * .62, cy - bh * .82) + " C" + e(cx + bw * .52, cy) + " " + e(cx + bw * .52, cy) + " " + e(cx + bw * .62, cy + bh * .82))], /* الخطوط */
+      [C(cx - bw * 1.18, cy - bh * .38, 1.5),
+       L([[cx - bw * 1.1, cy - bh * .82], [cx - bw * 1.35, cy - bh * 1.6]]),
+       L([[cx - bw * .82, cy - bh * .95], [cx - bw * .88, cy - bh * 1.75]]),
+       C(cx - bw * 1.37, cy - bh * 1.72, 1.6), C(cx - bw * .89, cy - bh * 1.88, 1.6),
+       P("M" + e(cx + bw * .98, cy + bh * .12) + " L" + e(cx + bw * 1.35, cy + bh * .35))] /* اللوامس والإبرة */
+    ];
+  } };
+
+  ANIMALS.penguin = { ar: "بطريق", en: "Penguin", build: function (r) {
+    var bw = 19 + r() * 3, bh = 27 + r() * 3, cx = 50, cy = 58;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
+    return [
+      [P("M" + e(cx - bw, cy + bh * .5) + " C" + e(cx - bw * 1.05, cy - bh * .85) + " " + e(cx + bw * 1.05, cy - bh * .85) + " " + e(cx + bw, cy + bh * .5) +
+          " C" + e(cx + bw * .9, cy + bh * 1.05) + " " + e(cx - bw * .9, cy + bh * 1.05) + " " + e(cx - bw, cy + bh * .5) + " Z")],
+      [P("M" + e(cx - bw * .6, cy - bh * .32) + " C" + e(cx - bw * .72, cy + bh * .6) + " " + e(cx + bw * .72, cy + bh * .6) + " " + e(cx + bw * .6, cy - bh * .32) +
+          " C" + e(cx + bw * .35, cy - bh * .72) + " " + e(cx - bw * .35, cy - bh * .72) + " " + e(cx - bw * .6, cy - bh * .32) + " Z")], /* البطن */
+      [C(cx - bw * .3, cy - bh * .62, 2), C(cx + bw * .3, cy - bh * .62, 2),
+       P("M" + e(cx, cy - bh * .45) + " L" + e(cx - bw * .22, cy - bh * .28) + " L" + e(cx + bw * .22, cy - bh * .28) + " Z")], /* الوجه */
+      [P("M" + e(cx - bw * .98, cy - bh * .18) + " C" + e(cx - bw * 1.5, cy + bh * .25) + " " + e(cx - bw * 1.35, cy + bh * .7) + " " + e(cx - bw * .92, cy + bh * .6)),
+       P("M" + e(cx + bw * .98, cy - bh * .18) + " C" + e(cx + bw * 1.5, cy + bh * .25) + " " + e(cx + bw * 1.35, cy + bh * .7) + " " + e(cx + bw * .92, cy + bh * .6))], /* الجناحان */
+      [P("M" + e(cx - bw * .55, cy + bh * 1.02) + " L" + e(cx - bw * .95, cy + bh * 1.2) + " L" + e(cx - bw * .2, cy + bh * 1.2) + " Z"),
+       P("M" + e(cx + bw * .55, cy + bh * 1.02) + " L" + e(cx + bw * .95, cy + bh * 1.2) + " L" + e(cx + bw * .2, cy + bh * 1.2) + " Z")] /* القدمان */
+    ];
+  } };
+
+  ANIMALS.sheep = { ar: "خروف", en: "Sheep", build: function (r) {
+    var bw = 23 + r() * 3, bh = 16 + r() * 2, cx = 54, cy = 58;
+    var e = function (a, b) { return n2(a) + " " + n2(b); };
+    /* كرات الصوف تُركَّز **على محيط الجسم العلوي** فتصنع حافة غيمية متصلة.
+       نثرها اعتباطاً حول الجسم يعطي فوضى لا صوفاً — جُرّب وشوهد. */
+    var puffs = [], i, a, n = 7, pr = bh * .46;
+    for (i = 0; i < n; i++) {
+      a = Math.PI + (i / (n - 1)) * Math.PI;
+      puffs.push(C(cx + bw * .94 * Math.cos(a), cy + bh * .92 * Math.sin(a), pr));
+    }
+    return [
+      [E(cx, cy, bw, bh)],
+      puffs,
+      [E(cx - bw * 1.02, cy + bh * .1, bh * .48, bh * .60, -14)],
+      [C(cx - bw * 1.14, cy - bh * .02, 1.4), C(cx - bw * .9, cy - bh * .06, 1.4),
+       E(cx - bw * 1.32, cy - bh * .22, bh * .17, bh * .30, -42),
+       E(cx - bw * .74, cy - bh * .26, bh * .17, bh * .30, 34),
+       P("M" + e(cx - bw * 1.06, cy + bh * .48) + " L" + e(cx - bw * .98, cy + bh * .48))],
+      [L([[cx - bw * .48, cy + bh * .95], [cx - bw * .5, cy + bh * 1.62]]),
+       L([[cx - bw * .12, cy + bh * 1.0], [cx - bw * .14, cy + bh * 1.62]]),
+       L([[cx + bw * .38, cy + bh * .97], [cx + bw * .4, cy + bh * 1.62]]),
+       L([[cx + bw * .72, cy + bh * .78], [cx + bw * .74, cy + bh * 1.62]])]
+    ];
+  } };
+
+  var ORDER = ["cat", "rabbit", "chick", "duck", "owl", "penguin", "sheep",
+               "elephant", "fish", "turtle", "frog", "butterfly", "bee", "snail"];
 
   /* ══════ العرض ══════ */
   function panel(steps, upTo, box) {

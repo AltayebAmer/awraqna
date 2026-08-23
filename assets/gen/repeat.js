@@ -146,8 +146,10 @@
     /* معرّف فريد لكل رسم: `<use href="#id">` يلتقط **أول** عنصر بهذا المعرّف
        في المستند كلّه. معرّف ثابت يجعل كل الأشكال على صفحة واحدة نسخةً من
        أوّلها — حدث فعلاً وشوهد في شبكة المعاينة. */
-    var id = "m" + (state.seed >>> 0).toString(36) + kind + (state.mode || "r");
-    var sw = 1.6;
+    var id = "m" + (state.seed >>> 0).toString(36) + kind + (state.mode || "r") + (state.idx || "");
+    /* السماكة تُقسَم على النسبة حين تصغر الزخرفة على الورقة، وإلا بدت
+       ثمانيةُ زخارف أثخنَ من واحدة رغم أن القيمة نفسها. */
+    var sw = (state.weight === undefined ? 1.6 : state.weight / 10);
     var body, guides = "";
 
     if (state.mode === "grid") {
@@ -183,6 +185,8 @@
     mirror: { ar: "مرآوي", en: "Mirror" }
   };
 
+  var PER = { 1: [1, 1], 4: [2, 2], 8: [2, 4] };
+
   function render(state) {
     var m = MODES[state.mode] || MODES.radial;
     var sn = SHAPE_NAMES[state.shape] || SHAPE_NAMES.star;
@@ -197,7 +201,20 @@
         ar: sn.ar + " · " + m.ar + " · " + detail,
         en: sn.en + " · " + m.en + " · " + detail
       },
-      sheet: '<div class="rp-wrap">' + build(state) + "</div>",
+      sheet: (function () {
+        var per = PER[state.per] ? Number(state.per) : 1;
+        if (per === 1) return '<div class="rp-wrap">' + build(state) + "</div>";
+        /* نسخ متطابقة عمداً: الورقة تُقصّ إلى بطاقات أو تُوزَّع على المجموعة. */
+        var cells = [], i, st;
+        for (i = 0; i < per; i++) {
+          /* معرّف فريد لكل نسخة: نسخ متطابقة بمعرّف واحد تعمل بالمصادفة،
+             لأن `<use>` يلتقط أول تعريف — وهي مصادفة لا يُبنى عليها. */
+          st = {}; for (var k in state) st[k] = state[k];
+          st.idx = "x" + i;
+          cells.push('<div class="rp-cell">' + build(st) + "</div>");
+        }
+        return '<div class="rp-grid" data-per="' + per + '">' + cells.join("") + "</div>";
+      })(),
       answers: ""
     };
   }
