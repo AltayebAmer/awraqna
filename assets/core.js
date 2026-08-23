@@ -162,6 +162,8 @@
     if (cfg.answers !== false) {
       var row = document.createElement("div");
       row.className = "ctl-row";
+      /* بعض الأنشطة داخل المجال الواحد بلا صفحة إجابات — إخفاء الزرّ
+         أصدق من عرضه معطّلاً أو فاعلاً بلا أثر. */
       row.innerHTML = '<div class="ctl-label"><span data-ar>الإجابات</span><span data-en>Answers</span></div>';
       var chips = document.createElement("div");
       chips.className = "chips";
@@ -175,6 +177,7 @@
         save(cfg.key, state); draw();
       });
       chips.appendChild(b); row.appendChild(chips); host.appendChild(row);
+      rows.push({ row: row, cfg: { showIf: cfg.answersShowIf } });
     }
 
     function draw() {
