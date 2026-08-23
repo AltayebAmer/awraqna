@@ -26,6 +26,10 @@
   }
   var ri = function (r, a, b) { return a + Math.floor(r() * (b - a + 1)); };
   var round = function (v, d) { var m = Math.pow(10, d); return Math.round(v * m) / m; };
+  var f2 = function (v) { return (Math.round(v * 100) / 100).toString(); };
+  /* الرقم السالب داخل <text> في صفحة RTL يُعرض «6−» بدل «−6».
+     علامة LRM (U+200E) تثبّت اتجاهه — جُرّب وشوهد على الورق. */
+  var num = function (v) { return "\u200e" + v; };
 
   /* ── ١. تحويل الوحدات ── */
   var UNITS = [
@@ -94,10 +98,124 @@
            '" preserveAspectRatio="xMidYMid meet">' + g.join("") + "</svg>";
   }
 
+  /* ══════ ٤. مسطرة ومنقلة للطباعة ══════
+     تُطبع بمقاسها الحقيقي: الوحدات مليمترية في SVG فما يخرج من الطابعة
+     مسطرةٌ يُقاس بها فعلاً، لا رسمٌ يشبه المسطرة. */
+  function rulerSVG(len, dual) {
+    var W = 186, g = [], i, x;
+    var y0 = 6, h = 26;
+    g.push('<rect x="0" y="' + y0 + '" width="' + len + '" height="' + h + '" fill="#fff" stroke="#111" stroke-width="0.4"/>');
+    g.push('<text x="2" y="' + (y0 + h * .62) + '" font-size="3" font-family="Menlo,monospace" fill="#999">cm</text>');
+    for (i = 0; i <= len; i++) {
+      var big = i % 10 === 0, mid = i % 5 === 0;
+      var t = big ? 9 : (mid ? 6 : 3.5);
+      g.push('<line x1="' + i + '" y1="' + y0 + '" x2="' + i + '" y2="' + (y0 + t) + '" stroke="#111" stroke-width="' + (big ? .45 : .25) + '"/>');
+      /* أرقام السنتيمتر تحت تدريجها مباشرة، وأرقام البوصة عند الحافة
+         المقابلة: وضعهما على الارتفاع نفسه جعل الرقمين يتراكبان. */
+      if (big) g.push('<text x="' + i + '" y="' + (y0 + 13) + '" font-size="3.2" text-anchor="middle" font-family="Menlo,monospace" fill="#111">' + (i / 10) + "</text>");
+    }
+    /* الحافة السفلى بالبوصة حين تُطلب — نصف بوصة = 12.7mm بالضبط. */
+    if (dual) {
+      var inch = 25.4, n = Math.floor(len / inch * 8);
+      for (i = 0; i <= n; i++) {
+        x = i * inch / 8;
+        var b8 = i % 8 === 0, b4 = i % 4 === 0, b2 = i % 2 === 0;
+        var t2 = b8 ? 9 : (b4 ? 6.5 : (b2 ? 4.5 : 3));
+        g.push('<line x1="' + f2(x) + '" y1="' + (y0 + h) + '" x2="' + f2(x) + '" y2="' + (y0 + h - t2) + '" stroke="#111" stroke-width="' + (b8 ? .45 : .25) + '"/>');
+        if (b8) g.push('<text x="' + f2(x) + '" y="' + (y0 + h - 2.5) + '" font-size="3.2" text-anchor="middle" font-family="Menlo,monospace" fill="#666">' + (i / 8) + "</text>");
+      }
+    }
+    return { w: W, h: y0 + h + 4, body: g.join("") };
+  }
+
+  function protractorSVG(R) {
+    var g = [], i, cx = 93, cy = 96;
+    g.push('<path d="M' + f2(cx - R) + " " + cy + " A" + R + " " + R + " 0 0 1 " + f2(cx + R) + " " + cy +
+           ' Z" fill="#fff" stroke="#111" stroke-width="0.5"/>');
+    g.push('<line x1="' + f2(cx - R) + '" y1="' + cy + '" x2="' + f2(cx + R) + '" y2="' + cy + '" stroke="#111" stroke-width="0.4"/>');
+    for (i = 0; i <= 180; i++) {
+      var a = Math.PI - (i / 180) * Math.PI;
+      var big = i % 10 === 0, mid = i % 5 === 0;
+      var t = big ? 8 : (mid ? 5 : 2.6);
+      g.push('<line x1="' + f2(cx + R * Math.cos(a)) + '" y1="' + f2(cy + R * Math.sin(a) * -1 + (R * Math.sin(a) * 2)) +
+             '" x2="0" y2="0" stroke="none"/>');
+    }
+    /* الرسم الفعلي للتدريج: من المحيط إلى الداخل. */
+    g = [g[0], g[1]];
+    for (i = 0; i <= 180; i++) {
+      var th = Math.PI * (1 - i / 180);
+      var big2 = i % 10 === 0, mid2 = i % 5 === 0;
+      var tl = big2 ? 8 : (mid2 ? 5 : 2.6);
+      var x1 = cx + R * Math.cos(th), y1 = cy - R * Math.sin(th);
+      var x2 = cx + (R - tl) * Math.cos(th), y2 = cy - (R - tl) * Math.sin(th);
+      g.push('<line x1="' + f2(x1) + '" y1="' + f2(y1) + '" x2="' + f2(x2) + '" y2="' + f2(y2) +
+             '" stroke="#111" stroke-width="' + (big2 ? .45 : .22) + '"/>');
+      if (big2 && i % 10 === 0) {
+        var xr = cx + (R - 13) * Math.cos(th), yr = cy - (R - 13) * Math.sin(th);
+        g.push('<text x="' + f2(xr) + '" y="' + f2(yr + 1.6) + '" font-size="3.6" text-anchor="middle" font-family="Menlo,monospace" fill="#111">' + i + "</text>");
+      }
+    }
+    g.push('<circle cx="' + cx + '" cy="' + cy + '" r="1.1" fill="#111"/>');
+    return g.join("");
+  }
+
+  /* ══════ ٥. راسم الدوال ══════
+     الرسم يُحسب من الدالة نفسها نقطةً نقطة ⇒ المنحنى صحيح بالبناء،
+     ولا يمكن أن يخالف المعادلة المطبوعة أعلاه. */
+  var FUNCS = {
+    linear: { ar: "خطية  y = ax + b", en: "Linear  y = ax + b",
+      make: function (r) { var a = (ri(r, -6, 6) || 2) / 2, b = ri(r, -6, 6);
+        return { f: function (x) { return a * x + b; }, label: "y = " + a + "x " + (b < 0 ? "− " + (-b) : "+ " + b) }; } },
+    quad:   { ar: "تربيعية  y = ax² + c", en: "Quadratic  y = ax² + c",
+      make: function (r) { var a = (ri(r, -4, 4) || 1) / 2, c = ri(r, -5, 5);
+        return { f: function (x) { return a * x * x + c; }, label: "y = " + a + "x² " + (c < 0 ? "− " + (-c) : "+ " + c) }; } },
+    cubic:  { ar: "تكعيبية  y = ax³ + bx", en: "Cubic  y = ax³ + bx",
+      make: function (r) { var a = (ri(r, 1, 3)) / 4, b = ri(r, -4, 4);
+        return { f: function (x) { return a * x * x * x + b * x; }, label: "y = " + a + "x³ " + (b < 0 ? "− " + (-b) : "+ " + b) + "x" }; } },
+    sine:   { ar: "جيبية  y = a·sin(bx)", en: "Sine  y = a·sin(bx)",
+      make: function (r) { var a = ri(r, 2, 6), b = ri(r, 1, 3);
+        return { f: function (x) { return a * Math.sin(b * x); },
+                 label: "y = " + a + "·sin(" + (b === 1 ? "x" : b + "x") + ")" }; } },
+    recip:  { ar: "عكسية  y = a / x", en: "Reciprocal  y = a / x",
+      make: function (r) { var a = ri(r, 2, 9);
+        return { f: function (x) { return x === 0 ? NaN : a / x; }, label: "y = " + a + " / x" }; } }
+  };
+
+  function plotSVG(fn, R) {
+    var c = 10, W = R * 2 * c, g = [], i;
+    g.push('<rect width="' + W + '" height="' + W + '" fill="#fff"/>');
+    for (i = 0; i <= R * 2; i++) {
+      var major = i === R;
+      g.push('<line x1="' + i * c + '" y1="0" x2="' + i * c + '" y2="' + W +
+             '" stroke="' + (major ? "#111" : "#d0d0d0") + '" stroke-width="' + (major ? .7 : .22) + '"/>');
+      g.push('<line x1="0" y1="' + i * c + '" x2="' + W + '" y2="' + i * c +
+             '" stroke="' + (major ? "#111" : "#d0d0d0") + '" stroke-width="' + (major ? .7 : .22) + '"/>');
+      if (i !== R && i % 2 === 0) {
+        g.push('<text x="' + (i * c) + '" y="' + (R * c + 4.2) + '" font-size="3" text-anchor="middle" font-family="Menlo,monospace" fill="#666">' + num(i - R) + "</text>");
+        g.push('<text x="' + (R * c - 1.5) + '" y="' + (i * c + 1.2) + '" font-size="3" text-anchor="end" font-family="Menlo,monospace" fill="#666">' + num(R - i) + "</text>");
+      }
+    }
+    /* المنحنى يُقطَع عند القفزات (مثل 1/x عند الصفر) فلا يُرسم خطٌّ وهمي. */
+    var runs = [], cur = [];
+    for (i = 0; i <= R * 2 * 12; i++) {
+      var x = -R + i / 12, y = fn(x);
+      if (!isFinite(y) || Math.abs(y) > R + 2) { if (cur.length > 1) runs.push(cur); cur = []; continue; }
+      cur.push(f2((x + R) * c) + "," + f2((R - y) * c));
+    }
+    if (cur.length > 1) runs.push(cur);
+    runs.forEach(function (rn) {
+      g.push('<polyline points="' + rn.join(" ") + '" fill="none" stroke="#111" stroke-width="1.1" stroke-linejoin="round"/>');
+    });
+    return '<svg class="sc-axes" xmlns="http://www.w3.org/2000/svg" viewBox="-6 -3 ' + (W + 9) + " " + (W + 8) +
+           '" preserveAspectRatio="xMidYMid meet">' + g.join("") + "</svg>";
+  }
+
   var TITLES = {
     units: { ar: "تحويل الوحدات", en: "Unit conversion" },
     laws:  { ar: "قوانين فيزيائية", en: "Physics formulas" },
-    coord: { ar: "شبكة الإحداثيات", en: "Coordinate grid" }
+    coord: { ar: "شبكة الإحداثيات", en: "Coordinate grid" },
+    tools: { ar: "مسطرة ومنقلة للطباعة", en: "Printable ruler & protractor" },
+    plot:  { ar: "راسم الدوال", en: "Function plotter" }
   };
   var LV = { easy: { ar: "سهل", en: "Easy" }, med: { ar: "متوسط", en: "Medium" }, hard: { ar: "صعب", en: "Hard" } };
   var EN = function () { return typeof Core !== "undefined" && Core.EN && Core.EN(); };
@@ -105,6 +223,31 @@
   function render(state) {
     var r = rng(state.seed), t = state.type, lv = state.level || "med";
     var items = [], answers = [], i, en = EN();
+
+    if (t === "tools") {
+      var rl = rulerSVG(180, true);
+      return {
+        title: TITLES.tools,
+        sub: { ar: "تُطبع بمقاسها الحقيقي — تحقّق قبل الاستعمال", en: "Prints at true size — verify before use" },
+        sheet: '<div class="sc-tools">' +
+               '<svg class="sc-ruler" xmlns="http://www.w3.org/2000/svg" width="186mm" height="' + rl.h +
+               'mm" viewBox="0 0 186 ' + rl.h + '">' + rl.body + "</svg>" +
+               '<svg class="sc-prot" xmlns="http://www.w3.org/2000/svg" width="186mm" height="102mm" viewBox="0 0 186 102">' +
+               protractorSVG(84) + "</svg></div>",
+        answers: ""
+      };
+    }
+
+    if (t === "plot") {
+      var F = FUNCS[state.fn] ? FUNCS[state.fn] : FUNCS.quad;
+      var made = F.make(r), Rp = lv === "easy" ? 6 : (lv === "med" ? 8 : 10);
+      return {
+        title: TITLES.plot,
+        sub: { ar: made.label, en: made.label },
+        sheet: '<div class="sc-coord">' + plotSVG(made.f, Rp) + "</div>",
+        answers: ""
+      };
+    }
 
     if (t === "coord") {
       var q = coordQ(r, lv);
@@ -143,5 +286,7 @@
     };
   }
 
-  return { render: render, unitQ: unitQ, lawQ: lawQ, coordQ: coordQ, UNITS: UNITS, LAWS: LAWS };
+  return { render: render, unitQ: unitQ, lawQ: lawQ, coordQ: coordQ,
+           rulerSVG: rulerSVG, protractorSVG: protractorSVG, plotSVG: plotSVG,
+           UNITS: UNITS, LAWS: LAWS, FUNCS: FUNCS };
 });

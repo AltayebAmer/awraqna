@@ -182,7 +182,11 @@
 .cd-seq{font-size:15px;letter-spacing:4px;text-align:center;direction:ltr;color:#111}
 .cd-ask{font-family:'SF Mono',Menlo,monospace;font-size:13px;text-align:center;color:#333;margin-top:5px}
 .sc-coord{display:flex;flex-direction:column;align-items:center;gap:12px}
-.sc-axes{display:block;width:100%;max-width:150mm;height:auto}
+/* المسطرة والمنقلة بوحدات mm صريحة في الـSVG ⇒ تخرج من الطابعة بمقاسها
+   الحقيقي. لا تضع لهما width:100% وإلا تمدّدا وفقدا معناهما. */
+.sc-tools{display:flex;flex-direction:column;align-items:center;gap:14px}
+.sc-ruler,.sc-prot{display:block;max-width:100%;height:auto}
+.sc-axes{display:block;width:100%;max-width:176mm;height:auto}
 .sc-pts{width:100%}
 .tm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .tm-item{position:relative;break-inside:avoid;page-break-inside:avoid;text-align:center;min-width:0}
@@ -335,7 +339,7 @@
   .cd-code{background:none;border:1px solid #ddd}
   .cd-tbl th{background:none}
   .cal th{background:none}
-  .sc-axes{max-width:150mm}
+  .sc-axes{max-width:176mm;max-height:225mm}
   .tm-clock{max-width:50mm}
 }
 
