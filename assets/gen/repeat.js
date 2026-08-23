@@ -76,6 +76,114 @@
       return out.join(" ");
     }
 
+    if (kind === "leaf") {
+      /* ورقة: شكل لوزي + عِرق أوسط + عروق جانبية متناظرة. */
+      var lw = (16 + r() * 8) * jitter, lh = 44 * jitter, out = [], i, k;
+      out.push("M50 " + f2(50 + lh) + " C" + f2(50 - lw) + " " + f2(50 + lh * .35) +
+               " " + f2(50 - lw * .9) + " " + f2(50 - lh * .45) + " 50 " + f2(50 - lh) +
+               " C" + f2(50 + lw * .9) + " " + f2(50 - lh * .45) +
+               " " + f2(50 + lw) + " " + f2(50 + lh * .35) + " 50 " + f2(50 + lh) + " Z");
+      out.push("M50 " + f2(50 + lh) + " L50 " + f2(50 - lh));
+      for (i = 1; i <= 4; i++) {
+        k = -lh * .55 + (i / 5) * lh * 1.25;
+        var sp = lw * (1 - Math.abs(k) / lh) * .8;
+        out.push("M50 " + f2(50 + k) + " L" + f2(50 - sp) + " " + f2(50 + k + lh * .16));
+        out.push("M50 " + f2(50 + k) + " L" + f2(50 + sp) + " " + f2(50 + k + lh * .16));
+      }
+      return out.join(" ");
+    }
+
+    if (kind === "flower") {
+      /* البتلة منحنيان تربيعيان حول محورها: نقطتا التحكّم على عمودي المحور
+         عند منتصفه. البناء بمنحنيات مكعّبة أعطى أشواكاً لا بتلات — جُرّب. */
+      var np = 5 + Math.floor(r() * 3), pl = 36 * jitter, pw = 11 + r() * 7, o2 = [], j;
+      for (j = 0; j < np; j++) {
+        var th = (j / np) * PI2 - Math.PI / 2;
+        var cs = Math.cos(th), sn = Math.sin(th);
+        var tx = 50 + pl * cs, ty = 50 + pl * sn;
+        var mx = 50 + pl * .55 * cs, my = 50 + pl * .55 * sn;
+        var px = -sn * pw, py = cs * pw;
+        o2.push("M50 50 Q" + f2(mx + px) + " " + f2(my + py) + " " + f2(tx) + " " + f2(ty) +
+                " Q" + f2(mx - px) + " " + f2(my - py) + " 50 50 Z");
+      }
+      var cr = 6 + r() * 4;
+      o2.push("M" + f2(50 - cr) + " 50 a" + f2(cr) + " " + f2(cr) + " 0 1 0 " + f2(cr * 2) +
+              " 0 a" + f2(cr) + " " + f2(cr) + " 0 1 0 " + f2(-cr * 2) + " 0 Z");
+      return o2.join(" ");
+    }
+
+    if (kind === "rose") {
+      /* وردة من أعلى: حلزون ناعم في القلب وبتلات مستديرة حوله.
+         الأقواس المتغيّرة نصف القطر (A) أعطت شكلاً مشوّهاً — استُبدلت بخطّ حلزوني. */
+      var R0 = 40 * jitter, o3 = [], i2, a3, rr3, pts3 = [];
+      for (i2 = 0; i2 <= 90; i2++) {
+        a3 = (i2 / 90) * PI2 * 2.7 - Math.PI / 2;
+        rr3 = 3 + (R0 * .58 - 3) * (i2 / 90);
+        pts3.push(f2(50 + rr3 * Math.cos(a3)) + " " + f2(50 + rr3 * Math.sin(a3)));
+      }
+      o3.push("M" + pts3.join(" L"));
+      var npp = 6 + Math.floor(r() * 3), k3;
+      for (k3 = 0; k3 < npp; k3++) {
+        var b1 = (k3 / npp) * PI2 - Math.PI / 2, b2 = ((k3 + 1) / npp) * PI2 - Math.PI / 2;
+        var bm = (b1 + b2) / 2;
+        var x1 = 50 + R0 * .62 * Math.cos(b1), y1 = 50 + R0 * .62 * Math.sin(b1);
+        var x2 = 50 + R0 * .62 * Math.cos(b2), y2 = 50 + R0 * .62 * Math.sin(b2);
+        var xm = 50 + R0 * 1.05 * Math.cos(bm), ym = 50 + R0 * 1.05 * Math.sin(bm);
+        o3.push("M" + f2(x1) + " " + f2(y1) + " Q" + f2(xm) + " " + f2(ym) + " " + f2(x2) + " " + f2(y2));
+      }
+      return o3.join(" ");
+    }
+
+    if (kind === "branch") {
+      /* غصن: ساق منحنٍ وأوراق متناوبة تصغر نحو القمة. */
+      var bl = 46 * jitter, o4 = [], m, N = 5 + Math.floor(r() * 3);
+      o4.push("M50 " + f2(50 + bl) + " C" + f2(50 - 10) + " " + f2(50 + bl * .3) +
+              " " + f2(50 + 10) + " " + f2(50 - bl * .3) + " 50 " + f2(50 - bl));
+      for (m = 0; m < N; m++) {
+        var u = m / (N - 1), y = 50 + bl - u * bl * 1.85;
+        var side = m % 2 ? 1 : -1, ls = (16 - u * 9) * jitter;
+        o4.push("M50 " + f2(y) + " C" + f2(50 + side * ls * .6) + " " + f2(y - ls * .55) +
+                " " + f2(50 + side * ls) + " " + f2(y - ls * .5) + " " + f2(50 + side * ls * 1.15) + " " + f2(y - ls * .95) +
+                " C" + f2(50 + side * ls * .7) + " " + f2(y - ls * .55) +
+                " " + f2(50 + side * ls * .35) + " " + f2(y - ls * .2) + " 50 " + f2(y));
+      }
+      return o4.join(" ");
+    }
+
+    if (kind === "tulip") {
+      /* خزامى: كأس بثلاث فصوص وساق وورقتان. */
+      var tw = 20 * jitter, th2 = 26 * jitter, o5 = [];
+      o5.push("M" + f2(50 - tw) + " " + f2(50 - th2 * .2) +
+              " C" + f2(50 - tw) + " " + f2(50 + th2 * .9) + " " + f2(50 + tw) + " " + f2(50 + th2 * .9) +
+              " " + f2(50 + tw) + " " + f2(50 - th2 * .2) +
+              " L" + f2(50 + tw * .55) + " " + f2(50 - th2) +
+              " L" + f2(50 + tw * .18) + " " + f2(50 - th2 * .45) +
+              " L50 " + f2(50 - th2 * 1.1) +
+              " L" + f2(50 - tw * .18) + " " + f2(50 - th2 * .45) +
+              " L" + f2(50 - tw * .55) + " " + f2(50 - th2) + " Z");
+      o5.push("M50 " + f2(50 + th2 * .85) + " L50 " + f2(50 + th2 * 1.9));
+      o5.push("M50 " + f2(50 + th2 * 1.25) + " C" + f2(50 - tw * 1.3) + " " + f2(50 + th2 * 1.0) +
+              " " + f2(50 - tw * 1.2) + " " + f2(50 + th2 * 1.75) + " 50 " + f2(50 + th2 * 1.62));
+      o5.push("M50 " + f2(50 + th2 * 1.45) + " C" + f2(50 + tw * 1.3) + " " + f2(50 + th2 * 1.2) +
+              " " + f2(50 + tw * 1.2) + " " + f2(50 + th2 * 1.95) + " 50 " + f2(50 + th2 * 1.82));
+      return o5.join(" ");
+    }
+
+    if (kind === "fern") {
+      /* سعفة: ساق وأوراق مزدوجة متقابلة تصغر تدريجياً. */
+      var fl = 44 * jitter, o6 = [], q, M = 8 + Math.floor(r() * 4);
+      o6.push("M50 " + f2(50 + fl) + " L50 " + f2(50 - fl));
+      for (q = 0; q < M; q++) {
+        var v = q / (M - 1), yy = 50 + fl - v * fl * 1.92;
+        var len = (18 - v * 14) * jitter, drop = len * .55;
+        o6.push("M50 " + f2(yy) + " C" + f2(50 - len * .5) + " " + f2(yy - drop * .2) +
+                " " + f2(50 - len * .9) + " " + f2(yy - drop * .7) + " " + f2(50 - len) + " " + f2(yy - drop));
+        o6.push("M50 " + f2(yy) + " C" + f2(50 + len * .5) + " " + f2(yy - drop * .2) +
+                " " + f2(50 + len * .9) + " " + f2(yy - drop * .7) + " " + f2(50 + len) + " " + f2(yy - drop));
+      }
+      return o6.join(" ");
+    }
+
     /* drop — دمعة */
     var dh = 46 * jitter, dw = (20 + r() * 12) * jitter;
     return "M50 " + f2(50 - dh) + " C" + f2(50 + dw) + " " + f2(50 - dh * 0.1) +
@@ -84,7 +192,8 @@
            " " + f2(50 - dw) + " " + f2(50 - dh * 0.1) + " 50 " + f2(50 - dh) + " Z";
   }
 
-  var SHAPES = ["star", "petal", "rhombus", "arc", "triangle", "rings", "drop"];
+  var SHAPES = ["star", "petal", "rhombus", "arc", "triangle", "rings", "drop",
+              "leaf", "flower", "rose", "tulip", "branch", "fern"];
   var SHAPE_NAMES = {
     star:     { ar: "نجمة",  en: "Star" },
     petal:    { ar: "بتلة",  en: "Petal" },
@@ -92,7 +201,13 @@
     arc:      { ar: "قوس",   en: "Arc" },
     triangle: { ar: "مثلّث",  en: "Triangle" },
     rings:    { ar: "حلقات", en: "Rings" },
-    drop:     { ar: "دمعة",  en: "Drop" }
+    drop:     { ar: "دمعة",  en: "Drop" },
+    leaf:     { ar: "ورقة",  en: "Leaf" },
+    flower:   { ar: "زهرة",  en: "Flower" },
+    rose:     { ar: "وردة",  en: "Rose" },
+    tulip:    { ar: "خزامى", en: "Tulip" },
+    branch:   { ar: "غصن",   en: "Branch" },
+    fern:     { ar: "سعفة",  en: "Fern" }
   };
 
   /* ══════ أوضاع التكرار الثلاثة ══════
