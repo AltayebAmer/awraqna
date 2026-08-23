@@ -4,7 +4,7 @@
   Core.mount({
     key: "language",
     answers: false,
-    state: { script: "ar", mode: "trace", per: 2, fontAr: "naskh", fontEn: "modern" },
+    state: { script: "ar", mode: "trace", per: 2, fontAr: "naskh", fontEn: "modern", fade: 0 },
     controls: [
       { k: "script", label: { ar: "الأبجدية", en: "Alphabet" }, opts: [
         { v: "ar",     ar: "حروف عربية",    en: "Arabic letters" },
@@ -35,7 +35,9 @@
         { v: 1, ar: "حرف واحد", en: "One" },
         { v: 2, ar: "حرفان",    en: "Two" },
         { v: 4, ar: "أربعة",    en: "Four" }
-      ] }
+      ] },
+      { k: "fade", label: { ar: "الشفافية", en: "Fade" },
+        type: "range", min: 0, max: 85, step: 5, unit: "%" }
     ],
     render: function (state) { return LangGen.render(state); }
   });

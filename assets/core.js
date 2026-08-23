@@ -65,6 +65,16 @@
            '<span class="cr-owner">' + (EN() ? "Artist Altayeb Amer" : "الفنان الطيب عامر") + "</span></div>";
   }
 
+  /* `fade` = نسبة الشفافية المطلوبة (0 = صلب). القيمة المخزَّنة هي
+     الشفافية نفسها لا معكوسها، حتى يطابق الرقمُ الظاهر اسمَ الزرّ.
+     الحدّ الأدنى 0.08 يمنع ورقة لا تُرى على الطابعة إطلاقاً. */
+  function ink(state, html) {
+    var f = Number(state.fade);
+    if (!f || f <= 0) return html;
+    var op = Math.max(0.08, 1 - f / 100);
+    return '<div class="sheet-body" style="opacity:' + (Math.round(op * 100) / 100) + '">' + html + "</div>";
+  }
+
   /* ── التخزين المحلي: مفتاح مستقل لكل مجال ───────────────── */
   function load(key, state) {
     try {
@@ -191,15 +201,19 @@
         return;
       }
       var title = T(out.title), sub = T(out.sub);
+      /* الشفافية تُطبَّق على **محتوى الورقة وحده** لا على الترويسة وسطر
+         النسبة: الغرض ورقة باهتة تُتبَّع بالقلم فوقها، لا صفحة كاملة باهتة
+         يختفي منها اسم الطالب والتاريخ. */
+      var body = ink(state, out.sheet);
       /* بعض المجالات (ورق المعلّم) ورقتها هي المنتج نفسه ⇒ لا ترويسة. */
       $("sheet").innerHTML = (out.head === false ? "" : sheetHead(title, sub, false, state.seed)) +
-                             out.sheet + credit();
+                             body + credit();
 
       var ael = $("answers");
       var showAns = cfg.answers !== false && state.withAnswers && out.answers;
       ael.hidden = !showAns;
       ael.innerHTML = showAns
-        ? sheetHead(EN() ? "Answer Key" : "صفحة الإجابات", sub, true, state.seed) + out.answers + credit()
+        ? sheetHead(EN() ? "Answer Key" : "صفحة الإجابات", sub, true, state.seed) + ink(state, out.answers) + credit()
         : "";
 
       var note = $("seedNote");
@@ -229,5 +243,5 @@
   }
 
   return { rng: rng, randInt: randInt, shuffle: shuffle, mount: mount,
-           esc: esc, T: T, EN: EN, log: log, sheetHead: sheetHead, credit: credit, version: "2.2" };
+           esc: esc, T: T, EN: EN, log: log, sheetHead: sheetHead, credit: credit, ink: ink, version: "2.3" };
 });

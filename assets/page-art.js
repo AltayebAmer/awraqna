@@ -9,7 +9,7 @@
   Core.mount({
     key: "art",
     answersShowIf: function (s) { return s.type === "dots" || s.type === "symmetry"; },
-    state: { type: "draw", level: "med", animal: "cat" },
+    state: { type: "draw", level: "med", animal: "cat", fade: 0 },
     controls: [
       { k: "type", label: { ar: "النشاط", en: "Activity" }, opts: [
         { v: "draw",     ar: "ارسم خطوة بخطوة", en: "Draw step by step" },
@@ -22,6 +22,8 @@
         opts: DrawGen.ORDER.map(function (a) {
           return { v: a, ar: DrawGen.ANIMALS[a].ar, en: DrawGen.ANIMALS[a].en };
         }) },
+      { k: "fade", label: { ar: "الشفافية", en: "Fade" },
+        type: "range", min: 0, max: 85, step: 5, unit: "%" },
       { k: "level", label: { ar: "المستوى", en: "Level" },
         showIf: function (s) { return s.type === "dots" || s.type === "symmetry"; }, opts: [
         { v: "easy", ar: "سهل", en: "Easy" },

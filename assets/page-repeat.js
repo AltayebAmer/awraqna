@@ -9,7 +9,7 @@
     key: "repeat",
     answers: false,
     state: { shape: "petal", mode: "radial", count: 16, radius: 0,
-             spin: 0, cols: 5, rows: 6, axes: 2, size: 140, weight: 16, per: 1 },
+             spin: 0, cols: 5, rows: 6, axes: 2, size: 140, weight: 16, per: 1, fade: 0 },
     controls: [
       { k: "shape", label: { ar: "الشكل", en: "Shape" },
         opts: RepeatGen.SHAPES.map(function (s) {
@@ -46,7 +46,9 @@
         { v: 1, ar: "واحدة", en: "One" },
         { v: 4, ar: "أربع",  en: "Four" },
         { v: 8, ar: "ثماني", en: "Eight" }
-      ] }
+      ] },
+      { k: "fade", label: { ar: "الشفافية", en: "Fade" },
+        type: "range", min: 0, max: 85, step: 5, unit: "%" }
     ],
     render: function (state) { return RepeatGen.render(state); }
   });

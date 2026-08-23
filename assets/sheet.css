@@ -235,6 +235,11 @@
   break-inside:avoid;page-break-inside:avoid}
 .rp-cell .rp-svg{max-width:none;max-height:none}
 
+/* ---------- الشفافية ----------
+   الشفافية على المحتوى وحده. `opacity` تُطبع في Chrome كما تُعرض،
+   والحدّ الأدنى مضبوط في core.js فلا تخرج ورقة بيضاء تماماً. */
+.sheet-body{display:block}
+
 /* ---------- سطر النسبة على الورق ---------- */
 .sheet-credit{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   margin-top:9px;padding-top:4px;border-top:1px solid #e8e8e8;
