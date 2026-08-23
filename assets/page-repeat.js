@@ -5,6 +5,10 @@
   var isG = function (s) { return s.mode === "grid"; };
   var isM = function (s) { return s.mode === "mirror"; };
   var isSp = function (s) { return s.shape === "spiral"; };
+  var hasSides = function (s) { return s.shape === "polygon" || s.shape === "star" || s.shape === "flare"; };
+  var hasInner = function (s) { return s.shape === "star" || s.shape === "flare"; };
+  var isRect   = function (s) { return s.shape === "rect"; };
+  var hasRatio = function (s) { return s.shape === "rect" || s.shape === "ellipse"; };
   var isSw = function (s) { return s.shape === "swirl"; };
   var isPh = function (s) { return s.shape === "phyllo"; };
   var isFilled = function (s) { return s.shape === "swirl" || s.shape === "phyllo"; };
@@ -28,6 +32,17 @@
         { v: "grid",   ar: "شبكي",  en: "Grid" },
         { v: "mirror", ar: "مرآوي", en: "Mirror" }
       ] },
+
+      /* مساطر أدوات الأشكال — كلٌّ تظهر مع شكلها وحده.
+         النسبة عند 100% تعطي مربّعاً ودائرة مثاليين. */
+      { k: "shSides", label: { ar: "عدد الأضلاع/الرؤوس", en: "Sides / points" },
+        type: "range", min: 3, max: 20, showIf: hasSides },
+      { k: "shInner", label: { ar: "نصف القطر الداخلي", en: "Inner radius" },
+        type: "range", min: 10, max: 90, unit: "%", showIf: hasInner },
+      { k: "shRound", label: { ar: "استدارة الزوايا", en: "Corner radius" },
+        type: "range", min: 0, max: 100, unit: "%", showIf: isRect },
+      { k: "shRatio", label: { ar: "النسبة (عرض/ارتفاع)", en: "Ratio (W/H)" },
+        type: "range", min: 30, max: 300, unit: "%", showIf: hasRatio },
 
       /* مساطر أداة الحلزون — تظهر مع الشكل الحلزوني وحده،
          تماماً كلوحة Spiral Tool في Illustrator. */

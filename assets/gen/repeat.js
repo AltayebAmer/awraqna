@@ -35,14 +35,78 @@
     var i, th, pts = [], d;
     var jitter = 0.85 + r() * 0.3;
 
+    /* ══ أدوات الأشكال — على نهج مجموعة Shape Tools ══
+       مضلّع ونجمة ومستطيل وبيضاوي وشعاع وخط، كلها بارامترية:
+       عدد الأضلاع/الرؤوس ونصف القطر الداخلي ونصف قطر الزوايا والنسبة. */
+    var sh = st || {};
+    var SIDES = Math.max(3, Math.min(20, sh.shSides === undefined ? 5 : sh.shSides));
+    var INNER = (sh.shInner === undefined ? 40 : sh.shInner) / 100;
+    var ROUND = (sh.shRound === undefined ? 0 : sh.shRound) / 100;
+    var RATIO = (sh.shRatio === undefined ? 100 : sh.shRatio) / 100;
+    var Rmax = 44 * jitter;
+
     if (kind === "star") {
-      var n = 5 + Math.floor(r() * 4), inner = (0.34 + r() * 0.16);
-      for (i = 0; i < n * 2; i++) {
-        th = (i / (n * 2)) * PI2 - Math.PI / 2;
-        var rad = (i % 2 ? inner : 0.46) * 100 * jitter;
-        pts.push([50 + rad * Math.cos(th), 50 + rad * Math.sin(th)]);
+      var pts0 = [], i0;
+      for (i0 = 0; i0 < SIDES * 2; i0++) {
+        var th0 = (i0 / (SIDES * 2)) * PI2 - Math.PI / 2;
+        var rd0 = (i0 % 2 ? INNER : 1) * Rmax;
+        pts0.push([50 + rd0 * Math.cos(th0), 50 + rd0 * Math.sin(th0)]);
       }
-      return "M" + pts.map(function (p) { return f2(p[0]) + " " + f2(p[1]); }).join(" L") + " Z";
+      return "M" + pts0.map(function (p) { return f2(p[0]) + " " + f2(p[1]); }).join(" L") + " Z";
+    }
+
+    if (kind === "polygon") {
+      var pg = [], i1;
+      for (i1 = 0; i1 < SIDES; i1++) {
+        var th1 = (i1 / SIDES) * PI2 - Math.PI / 2;
+        pg.push([50 + Rmax * Math.cos(th1), 50 + Rmax * Math.sin(th1)]);
+      }
+      return "M" + pg.map(function (p) { return f2(p[0]) + " " + f2(p[1]); }).join(" L") + " Z";
+    }
+
+    if (kind === "rect") {
+      /* نسبة العرض إلى الارتفاع مع تثبيت الامتداد الأكبر عند Rmax،
+         ونصف قطر الزوايا يغطّي «المستطيل المستدير» بلا أداة منفصلة. */
+      var w1 = RATIO >= 1 ? Rmax : Rmax * RATIO;
+      var h1 = RATIO >= 1 ? Rmax / RATIO : Rmax;
+      var cr = Math.min(w1, h1) * ROUND;
+      var x0 = 50 - w1, y0 = 50 - h1, x1 = 50 + w1, y1 = 50 + h1;
+      if (cr < 0.4)
+        return "M" + f2(x0) + " " + f2(y0) + " L" + f2(x1) + " " + f2(y0) +
+               " L" + f2(x1) + " " + f2(y1) + " L" + f2(x0) + " " + f2(y1) + " Z";
+      return "M" + f2(x0 + cr) + " " + f2(y0) + " L" + f2(x1 - cr) + " " + f2(y0) +
+             " A" + f2(cr) + " " + f2(cr) + " 0 0 1 " + f2(x1) + " " + f2(y0 + cr) +
+             " L" + f2(x1) + " " + f2(y1 - cr) +
+             " A" + f2(cr) + " " + f2(cr) + " 0 0 1 " + f2(x1 - cr) + " " + f2(y1) +
+             " L" + f2(x0 + cr) + " " + f2(y1) +
+             " A" + f2(cr) + " " + f2(cr) + " 0 0 1 " + f2(x0) + " " + f2(y1 - cr) +
+             " L" + f2(x0) + " " + f2(y0 + cr) +
+             " A" + f2(cr) + " " + f2(cr) + " 0 0 1 " + f2(x0 + cr) + " " + f2(y0) + " Z";
+    }
+
+    if (kind === "ellipse") {
+      var rx = RATIO >= 1 ? Rmax : Rmax * RATIO;
+      var ry = RATIO >= 1 ? Rmax / RATIO : Rmax;
+      return "M" + f2(50 - rx) + " 50 a" + f2(rx) + " " + f2(ry) + " 0 1 0 " + f2(rx * 2) +
+             " 0 a" + f2(rx) + " " + f2(ry) + " 0 1 0 " + f2(-rx * 2) + " 0 Z";
+    }
+
+    if (kind === "flare") {
+      /* شعاع: أذرع رفيعة تتناوب طولاً وقصراً حول المركز. */
+      var fl = [], i2;
+      for (i2 = 0; i2 < SIDES * 2; i2++) {
+        var th2 = (i2 / (SIDES * 2)) * PI2 - Math.PI / 2;
+        var rd2 = (i2 % 2 ? INNER : 1) * Rmax;
+        fl.push("M50 50 L" + f2(50 + rd2 * Math.cos(th2)) + " " + f2(50 + rd2 * Math.sin(th2)));
+      }
+      fl.push("M" + f2(50 - Rmax * 0.12) + " 50 a" + f2(Rmax * 0.12) + " " + f2(Rmax * 0.12) +
+              " 0 1 0 " + f2(Rmax * 0.24) + " 0 a" + f2(Rmax * 0.12) + " " + f2(Rmax * 0.12) +
+              " 0 1 0 " + f2(-Rmax * 0.24) + " 0 Z");
+      return fl.join(" ");
+    }
+
+    if (kind === "line") {
+      return "M" + f2(50 - Rmax) + " 50 L" + f2(50 + Rmax) + " 50";
     }
 
     if (kind === "petal") {
@@ -298,11 +362,17 @@
            " " + f2(50 - dw) + " " + f2(50 - dh * 0.1) + " 50 " + f2(50 - dh) + " Z";
   }
 
-  var SHAPES = ["star", "petal", "rhombus", "arc", "triangle", "rings", "drop",
+  var SHAPES = ["rect", "ellipse", "polygon", "star", "flare", "line",
+                "petal", "rhombus", "arc", "triangle", "rings", "drop",
               "leaf", "flower", "rose", "tulip", "branch", "fern",
               "spiral", "swirl", "phyllo"];
   var SHAPE_NAMES = {
-    star:     { ar: "نجمة",  en: "Star" },
+    rect:     { ar: "مستطيل", en: "Rectangle" },
+    ellipse:  { ar: "بيضاوي", en: "Ellipse" },
+    polygon:  { ar: "مضلّع",  en: "Polygon" },
+    star:     { ar: "نجمة",   en: "Star" },
+    flare:    { ar: "شعاع",   en: "Flare" },
+    line:     { ar: "خط",     en: "Line" },
     petal:    { ar: "بتلة",  en: "Petal" },
     rhombus:  { ar: "معيّن",  en: "Rhombus" },
     arc:      { ar: "قوس",   en: "Arc" },

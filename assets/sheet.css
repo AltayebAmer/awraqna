@@ -215,6 +215,22 @@
 .dw-new{fill:none;stroke:#111;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .dw-solo .dw-new{stroke-width:1.4}
 
+/* ---------- الحنّة ---------- */
+.hn-wrap{display:flex;justify-content:center;align-items:center}
+.hn-svg{display:block;width:100%;max-width:180mm;height:auto;max-height:235mm}
+/* كل الرسم بخطوط بلا تعبئة — الحنّة خطّ لا كتلة. */
+.hn-ink{fill:none;stroke:#111;stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
+/* النقاط وحدها ممتلئة. تعبئة كل الدوائر حوّلت الزهرة والدائرة إلى قرص
+   أسود وملأت راحة الكفّ — الحنّة خطّ لا كتلة. */
+.hn-ink circle{fill:none}
+.hn-ink .hn-dot{fill:#111;stroke:none}
+.hn-ink .hn-thin{stroke-width:.5;fill:none}
+.hn-fill line{stroke-width:.5;stroke:#111}
+.hn-fill circle,.hn-fill .hn-dot{fill:#111;stroke:none}
+.hn-outline{stroke-width:1.6}
+.hn-guide{stroke:#c8c8c8;stroke-width:.6;stroke-dasharray:3 3;fill:none}
+.hn-hand{max-width:150mm}
+
 /* ---------- المسطرة الرقمية ---------- */
 .rangebox{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .rng{flex:1;min-width:0;-webkit-appearance:none;appearance:none;height:5px;border-radius:99px;
@@ -310,7 +326,9 @@
   .puz-grid{gap:12px}
   .puz-n{background:none;border:1px solid #999;color:#000}
   /* الشكل مربّع فلا يملأ ارتفاع A4 — يُتوسَّط رأسياً فيبدو مقصوداً لا ناقصاً. */
-  .art-wrap,.rp-wrap,.dw-solo{min-height:232mm;align-items:center}
+  .art-wrap,.rp-wrap,.dw-solo,.hn-wrap{min-height:232mm;align-items:center}
+  .hn-svg{max-height:232mm}
+  .hn-guide{stroke:#d5d5d5}
   /* الارتفاع يُثبَّت رقمياً لكل تخطيط: `1fr` وحدها لا تكفي لأن الـSVG
      يحتفظ بنسبته المربّعة فيتمدّد خارج الصف — ثماني زخارف صارت صفحتين. */
   .rp-grid{grid-auto-rows:auto}
