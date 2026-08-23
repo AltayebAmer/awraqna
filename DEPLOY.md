@@ -10,6 +10,7 @@
 |---|---|
 | `DEPLOY.md` | تعليمات داخلية |
 | `PROJECT_MAP.md` · `CLAUDE.md` · `ROADMAP.md` | ذاكرة تطوير |
+| `guardian.config.json` | مدخل الحاقن وقت البناء — لا يقرأه المتصفح |
 | `.git/` · `.gitignore` | تُستبعد تلقائياً |
 | `../.claude/launch.json` | خارج المجلد أصلاً |
 
@@ -17,6 +18,11 @@
 · `art/` · `language/` · `coding/` · `science/` · `time-money/`
 · `404.html` · `robots.txt` · `sitemap.xml` · `favicon.ico` · `favicon.svg`
 · `apple-touch-icon.png` · `_headers` · `assets/` (بما فيه `assets/fonts/`)
+· **`humans.txt` · `LICENSE.md` · `.well-known/guardian.json`** (طبقة الملكية)
+
+> **الحارس:** `assets/guardian-config.js` يجب أن يُرفع مع `assets/guardian.js`
+> ويُحمَّل قبله. بدونه يسقط الحارس إلى الافتراضيات ويصبح اسم المشروع
+> هو اسم المضيف. **و`.well-known/` مجلد مخفي** — تأكّد أن أداة الرفع لا تتخطّاه.
 
 > **الخطوط:** `assets/fonts/` يحوي ثلاثة خطوط بترخيص SIL OFL مجزّأة على
 > المحارف العربية (146KB إجمالاً). **لا تحذف `assets/fonts/OFL.txt`** — بقاء
@@ -41,6 +47,8 @@ curl -s https://awraqna.com/robots.txt
 curl -sI https://awraqna.com/assets/gen/math.js | grep -i cache-control
 curl -sI https://awraqna.com/assets/fonts/amiri.woff2 | grep -iE "content-type|cache-control" 
 curl -sI https://awraqna.com/nope | head -1
+curl -sI https://awraqna.com | grep -i "x-creator\|x-guardian"
+curl -s https://awraqna.com/.well-known/guardian.json | head -3
 for p in "" math/ puzzles/ teacher/; do curl -s -o /dev/null -w "$p %{http_code}\n" https://awraqna.com/$p; done
 ```
 المتوقع: `200` · محتوى robots · `max-age=86400, must-revalidate` · `404` · و`200` للمجالات الأربعة.

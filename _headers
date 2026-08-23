@@ -1,6 +1,12 @@
 # ترويسات Cloudflare Pages / Netlify — أوراقنا | awraqna.com
 
 /*
+  # GUARDIAN — الحاقن يتخطّى _headers الموجود، فهذه الأربعة تُضاف يدوياً.
+  # (`guardian_verify.py` يعطي ✓ لمجرّد وجود أي ترويسة X- فلا تثق بفحصه هنا.)
+  X-Creator: Artist Altayeb Amer
+  X-Author: Artist Altayeb Amer (al-Fannan al-Tayeb Amer)
+  X-Copyright: (c) 2026 Artist Altayeb Amer - https://awraqna.com
+  X-Guardian: ALTAYEB GUARDIAN v4.0
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin

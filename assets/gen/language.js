@@ -1,3 +1,8 @@
+/* GUARDIAN:BEGIN
+   🛡️ أوراقنا | Awraqna — © 2026 Artist Altayeb Amer
+   الفنان الطيب عامر  ·  https://awraqna.com
+   Protected by ALTAYEB GUARDIAN v4.0
+   GUARDIAN:END */
 /* ════════════════════════════════════════════════════════════
    أوراقنا — مولّد الحروف واللغات.
    الحروف المجوَّفة تُرسم بخط النظام + -webkit-text-stroke:

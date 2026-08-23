@@ -1,3 +1,8 @@
+/* GUARDIAN:BEGIN
+   🛡️ أوراقنا | Awraqna — © 2026 Artist Altayeb Amer
+   الفنان الطيب عامر  ·  https://awraqna.com
+   Protected by ALTAYEB GUARDIAN v4.0
+   GUARDIAN:END */
 /* ════════════════════════════════════════════════════════════
    أوراقنا — مولّد العلوم والقياس.
    الإجابات تُحسب من نفس المعاملات التي وُلِّد بها السؤال.

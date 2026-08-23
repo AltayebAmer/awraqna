@@ -1,3 +1,8 @@
+/* GUARDIAN:BEGIN
+   🛡️ أوراقنا | Awraqna — © 2026 Artist Altayeb Amer
+   الفنان الطيب عامر  ·  https://awraqna.com
+   Protected by ALTAYEB GUARDIAN v4.0
+   GUARDIAN:END */
 /* ════════════════════════════════════════════════════════════
    007.gallery — نظام «رد المعروف» الإعلاني  v1.0
    © 2026 Artist Altayeb Amer / الفنان الطيب عامر
@@ -46,8 +51,14 @@
   ];
 
   const T = () => document.documentElement.getAttribute("lang") === "en";
-  let seed = Math.floor(Math.random() * HOUSE.length);
-  function pick() { const a = HOUSE[seed % HOUSE.length]; seed++; return a; }
+
+  /* لا تعرض إعلاناً رابطه "#": ثلاثة من مشاريع المالك لم تُطلق بعد،
+     وعرضها يفتح تبويباً فارغاً — إعلان معطوب أسوأ من مساحة أقل.
+     حين يُطلق أيٌّ منها يكفي وضع رابطه أعلاه فيعود تلقائياً. */
+  const LIVE = HOUSE.filter(a => a.url && a.url !== "#");
+  const POOL = LIVE.length ? LIVE : HOUSE;
+  let seed = Math.floor(Math.random() * POOL.length);
+  function pick() { const a = POOL[seed % POOL.length]; seed++; return a; }
 
   /* ── الأنماط ─────────────────────────────────────────────── */
   const CSS = `
@@ -161,7 +172,7 @@
   }
   function hideWaiting() { if (waitEl) waitEl.classList.remove("show"); }
 
-  const ADS = { HOUSE, mountAll, render, showWaiting, hideWaiting, version: "1.0" };
+  const ADS = { HOUSE, LIVE, mountAll, render, showWaiting, hideWaiting, version: "1.1" };
   global.ADS = ADS;
 
   if (document.readyState === "loading")

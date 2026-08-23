@@ -1,3 +1,8 @@
+/* GUARDIAN:BEGIN
+   🛡️ أوراقنا | Awraqna — © 2026 Artist Altayeb Amer
+   الفنان الطيب عامر  ·  https://awraqna.com
+   Protected by ALTAYEB GUARDIAN v4.0
+   GUARDIAN:END */
 /* ════════════════════════════════════════════════════════════
    أوراقنا — النواة المشتركة بين كل المجالات.
    كل ما يتكرر في أكثر من صفحتين يعيش هنا: العشوائية بـ seed،

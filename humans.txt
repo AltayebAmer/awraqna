@@ -1,0 +1,13 @@
+/* TEAM */
+  Creator: Artist Altayeb Amer
+  المبتكر: الفنان الطيب عامر
+  Site: https://awraqna.com
+  Contact: artist.and.love@gmail.com
+
+/* SITE */
+  Name: أوراقنا | Awraqna
+  Version: 5.0.0
+  Standards: HTML5, CSS3, JavaScript
+  Protection: ALTAYEB GUARDIAN v4.0
+
+© 2026 Artist Altayeb Amer — All rights reserved
