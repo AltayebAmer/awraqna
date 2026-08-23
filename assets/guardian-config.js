@@ -1,3 +1,8 @@
+/* GUARDIAN:BEGIN
+   أوراقنا | Awraqna — © 2026 Artist Altayeb Amer / الفنان الطيب عامر
+   Source: https://awraqna.com — All rights reserved
+   Protected by ALTAYEB GUARDIAN v4.0
+GUARDIAN:END */
 /* ════════════════════════════════════════════════════════════
    أوراقنا — إعدادات الحارس **وقت التشغيل**.
    ملف `guardian.config.json` يقرأه الحاقن وحده ولا يصل إلى المتصفح،
