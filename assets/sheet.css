@@ -13,6 +13,9 @@
   padding:18px 20px;margin:22px auto;box-shadow:var(--shadow)}
 .ctl-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 0}
 .ctl-row+.ctl-row{border-top:1px solid var(--line)}
+/* سمة hidden وحدها لا تكفي: `display:flex` أعلاه تتغلّب على أسلوب المتصفح
+   الافتراضي لها، فتظهر كل المساطر معاً مهما كان الوضع — حدث وشوهد. */
+.ctl-row[hidden]{display:none}
 .ctl-label{flex:0 0 92px;font-size:13px;font-weight:800;color:var(--txt-dim)}
 .chips{display:flex;gap:8px;flex-wrap:wrap;min-width:0}
 .chip{border:1px solid var(--line-2);background:var(--card-2);color:var(--txt-dim);
@@ -193,6 +196,24 @@
 .cal td{border:1px solid #999;height:31mm;vertical-align:top;padding:3px}
 .cal-n{font-size:12px;font-weight:700;color:#444}
 
+/* ---------- المسطرة الرقمية ---------- */
+.rangebox{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.rng{flex:1;min-width:0;-webkit-appearance:none;appearance:none;height:5px;border-radius:99px;
+  background:var(--line-2);outline:none;cursor:pointer}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-2));cursor:grab;
+  box-shadow:0 2px 8px rgba(212,175,55,.45);border:none}
+.rng::-webkit-slider-thumb:active{cursor:grabbing}
+.rng::-moz-range-thumb{width:19px;height:19px;border-radius:50%;border:none;
+  background:var(--gold);cursor:grab}
+.rngval{flex:none;min-width:52px;text-align:center;font-family:'SF Mono',Menlo,monospace;
+  font-size:13px;font-weight:800;color:var(--gold-2);background:var(--card-2);
+  border:1px solid var(--line-2);border-radius:8px;padding:4px 8px;direction:ltr}
+
+/* ---------- ورقة الزخرفة ---------- */
+.rp-wrap{display:flex;justify-content:center;align-items:center}
+.rp-svg{display:block;width:100%;max-width:186mm;height:auto;max-height:238mm}
+
 /* ---------- سطر النسبة على الورق ---------- */
 .sheet-credit{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   margin-top:9px;padding-top:4px;border-top:1px solid #e8e8e8;
@@ -202,6 +223,7 @@
 /* ---------- الموبايل ---------- */
 @media (max-width:640px){
   .ctl-label{flex-basis:100%}
+  .rangebox{width:100%}
   #print-root{padding:0 14px}
   .sheet{padding:16px 14px}
   .q-grid{grid-template-columns:repeat(2,1fr)}
@@ -257,7 +279,8 @@
   .puz-grid{gap:12px}
   .puz-n{background:none;border:1px solid #999;color:#000}
   /* الشكل مربّع فلا يملأ ارتفاع A4 — يُتوسَّط رأسياً فيبدو مقصوداً لا ناقصاً. */
-  .art-wrap{min-height:236mm;align-items:center}
+  .art-wrap,.rp-wrap{min-height:232mm;align-items:center}
+  .rp-svg{max-height:232mm}
   .art-svg{max-height:236mm}
   .lt-block{border-color:#ccc}
   /* على الورق تُمَطّ الشبكة لتملأ مساحة الطباعة بعد الترويسة وسطر النسبة،

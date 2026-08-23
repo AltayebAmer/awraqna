@@ -1,0 +1,46 @@
+/* أوراقنا — ربط صفحة الزخرفة والتكرار بالنواة. */
+(function () {
+  "use strict";
+  var isR = function (s) { return s.mode === "radial"; };
+  var isG = function (s) { return s.mode === "grid"; };
+  var isM = function (s) { return s.mode === "mirror"; };
+
+  Core.mount({
+    key: "repeat",
+    answers: false,
+    state: { shape: "petal", mode: "radial", count: 16, radius: 0,
+             spin: 0, cols: 5, rows: 6, axes: 2, size: 140 },
+    controls: [
+      { k: "shape", label: { ar: "الشكل", en: "Shape" },
+        opts: RepeatGen.SHAPES.map(function (s) {
+          return { v: s, ar: RepeatGen.SHAPE_NAMES[s].ar, en: RepeatGen.SHAPE_NAMES[s].en };
+        }) },
+      /* تغيير الوضع لا يغيّر الـ seed: الشكل نفسه يجب أن يبقى
+         ليرى المصمّم أثر الوضع وحده — كما في Illustrator. */
+      { k: "mode", label: { ar: "نوع التكرار", en: "Repeat" }, keepSeed: true, opts: [
+        { v: "radial", ar: "شعاعي", en: "Radial" },
+        { v: "grid",   ar: "شبكي",  en: "Grid" },
+        { v: "mirror", ar: "مرآوي", en: "Mirror" }
+      ] },
+
+      { k: "count",  label: { ar: "عدد التكرار", en: "Copies" },
+        type: "range", min: 3, max: 36, showIf: isR },
+      { k: "radius", label: { ar: "القطر", en: "Radius" },
+        type: "range", min: 0, max: 130, showIf: function (s) { return isR(s) || isM(s); } },
+      { k: "spin",   label: { ar: "زاوية البدء", en: "Start angle" },
+        type: "range", min: 0, max: 359, unit: "°", showIf: isR },
+
+      { k: "cols",   label: { ar: "التكرار الأفقي", en: "Columns" },
+        type: "range", min: 1, max: 14, showIf: isG },
+      { k: "rows",   label: { ar: "التكرار العمودي", en: "Rows" },
+        type: "range", min: 1, max: 18, showIf: isG },
+
+      { k: "axes",   label: { ar: "خطوط التناظر", en: "Mirror axes" },
+        type: "range", min: 2, max: 12, showIf: isM },
+
+      { k: "size",   label: { ar: "حجم الشكل", en: "Shape size" },
+        type: "range", min: 20, max: 180, unit: "%" }
+    ],
+    render: function (state) { return RepeatGen.render(state); }
+  });
+})();

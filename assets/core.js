@@ -93,34 +93,71 @@
     var host = $("controls");
     if (!host) { log("error", "لا يوجد #controls في الصفحة"); return; }
 
-    /* الأزرار: نقرة واحدة لكل خيار — القوائم المنسدلة نقرتان وتكسر معيار ٣ النقرات. */
+    /* الأزرار: نقرة واحدة لكل خيار — القوائم المنسدلة نقرتان وتكسر معيار ٣ النقرات.
+       والمساطر الرقمية (range) لما هو كمّي بطبعه: عدد التكرار، القطر، الصفوف.
+       زرّاً لكل قيمة من ٣ إلى ٣٦ عبث. */
+    var rows = [];
     cfg.controls.forEach(function (c) {
       var row = document.createElement("div");
       row.className = "ctl-row";
       row.innerHTML = '<div class="ctl-label"><span data-ar>' + c.label.ar + '</span>' +
                       '<span data-en>' + c.label.en + "</span></div>";
-      var chips = document.createElement("div");
-      chips.className = "chips";
-      chips.setAttribute("role", "group");
-      c.opts.forEach(function (o) {
-        var b = document.createElement("button");
-        b.type = "button";
-        b.className = "chip";
-        b.setAttribute("aria-pressed", String(state[c.k] === o.v));
-        b.innerHTML = '<span data-ar>' + o.ar + '</span><span data-en>' + o.en + "</span>";
-        b.addEventListener("click", function () {
-          if (state[c.k] === o.v) return;
-          state[c.k] = o.v;
-          state.seed++;
-          chips.querySelectorAll(".chip").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
-          b.setAttribute("aria-pressed", "true");
-          save(cfg.key, state); draw();
+
+      if (c.type === "range") {
+        var wrap = document.createElement("div");
+        wrap.className = "rangebox";
+        var inp = document.createElement("input");
+        inp.type = "range";
+        inp.min = c.min; inp.max = c.max; inp.step = c.step || 1;
+        inp.value = state[c.k];
+        inp.className = "rng";
+        inp.setAttribute("aria-label", c.label.ar);
+        var out = document.createElement("output");
+        out.className = "rngval";
+        out.textContent = state[c.k] + (c.unit || "");
+        /* التحديث فوري أثناء السحب — المعاينة الحيّة هي الفائدة كلها. */
+        inp.addEventListener("input", function () {
+          state[c.k] = Number(inp.value);
+          out.textContent = inp.value + (c.unit || "");
+          draw();
         });
-        chips.appendChild(b);
-      });
-      row.appendChild(chips);
+        inp.addEventListener("change", function () { save(cfg.key, state); });
+        wrap.appendChild(inp); wrap.appendChild(out);
+        row.appendChild(wrap);
+      } else {
+        var chips = document.createElement("div");
+        chips.className = "chips";
+        chips.setAttribute("role", "group");
+        c.opts.forEach(function (o) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "chip";
+          b.setAttribute("aria-pressed", String(state[c.k] === o.v));
+          b.innerHTML = '<span data-ar>' + o.ar + '</span><span data-en>' + o.en + "</span>";
+          b.addEventListener("click", function () {
+            if (state[c.k] === o.v) return;
+            state[c.k] = o.v;
+            if (c.keepSeed !== true) state.seed++;
+            chips.querySelectorAll(".chip").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+            b.setAttribute("aria-pressed", "true");
+            save(cfg.key, state); sync(); draw();
+          });
+          chips.appendChild(b);
+        });
+        row.appendChild(chips);
+      }
       host.appendChild(row);
+      rows.push({ row: row, cfg: c });
     });
+
+    /* إظهار الصفوف المرتبطة بالوضع الحالي فقط: مساطر الشعاعي لا معنى لها
+       في الشبكي، وعرضها معطّلةً يربك أكثر مما يوضّح. */
+    function sync() {
+      rows.forEach(function (r) {
+        if (typeof r.cfg.showIf === "function") r.row.hidden = !r.cfg.showIf(state);
+      });
+    }
+    sync();
 
     if (cfg.answers !== false) {
       var row = document.createElement("div");
@@ -185,9 +222,9 @@
     try { saved = localStorage.getItem("awraqna_lang"); } catch (e) {}
     if (saved === "en") setLang("en"); else draw();
 
-    window.AWRAQNA = { state: state, draw: draw, key: cfg.key };
+    window.AWRAQNA = { state: state, draw: draw, sync: sync, key: cfg.key };
   }
 
   return { rng: rng, randInt: randInt, shuffle: shuffle, mount: mount,
-           esc: esc, T: T, EN: EN, log: log, sheetHead: sheetHead, credit: credit, version: "2.1" };
+           esc: esc, T: T, EN: EN, log: log, sheetHead: sheetHead, credit: credit, version: "2.2" };
 });
