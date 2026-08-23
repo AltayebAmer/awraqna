@@ -23,6 +23,11 @@
   var PI2 = Math.PI * 2;
   var f2 = function (n) { return (Math.round(n * 100) / 100).toString(); };
 
+  /* عدّاد يضمن تفرّد معرّف <defs> في كل استدعاء مهما تطابقت المعاملات.
+     الاعتماد على الـseed وحده يجعل رسمين بنفس الإعدادات على صفحة واحدة
+     يتشاركان المعرّف، فيلتقط `<use>` أوّلهما ويظهر الرسمان متطابقين. */
+  var uid = 0;
+
   /* ══════ العناصر السبعة ══════
      كل عنصر مرسوم داخل مربّع 100×100 مركزه (50,50)، ويقبل معاملات
      من العشوائية فيختلف شكله بين توليد وآخر دون أن يتغيّر نوعه. */
@@ -136,13 +141,17 @@
     if (kind === "spiral") {
       var sp = st || {};
       var R = (sp.spR === undefined ? 44 : sp.spR) * jitter;
-      var decay = (sp.spDecay === undefined ? 88 : sp.spDecay) / 100;
+      /* الاضمحلال في Illustrator يُقاس **لكل لفّة كاملة** لا لكل قطاع،
+         واللفّة = ٤ قطاعات. تطبيقه لكل قطاع جعل 80% تساوي 0.8⁴ ≈ 41%
+         للفّة الواحدة فخرج الحلزون أضيق بكثير من أداة Adobe. */
+      var decay = (sp.spDecay === undefined ? 80 : sp.spDecay) / 100;
+      var perSeg = Math.pow(decay, 1 / 4);
       var segs = sp.spSegs === undefined ? 14 : sp.spSegs;
       var dir = sp.spDir === "ccw" ? -1 : 1;
       var out = [], t, pts = [], step = 0.06;
       for (t = 0; t <= segs; t += step) {
         var ang = t * (Math.PI / 2) * dir - Math.PI / 2;
-        var rr = R * Math.pow(decay, t);
+        var rr = R * Math.pow(perSeg, t);
         pts.push(f2(50 + rr * Math.cos(ang)) + " " + f2(50 + rr * Math.sin(ang)));
       }
       out.push("M" + pts.join(" L"));
@@ -154,7 +163,7 @@
         var k;
         for (k = 1; k <= segs; k++) {
           var a2 = k * (Math.PI / 2) * dir - Math.PI / 2;
-          var r2 = R * Math.pow(decay, k);
+          var r2 = R * Math.pow(perSeg, k);
           if (r2 < R * 0.22) break;
           var ux = Math.cos(a2), uy = Math.sin(a2);
           var bx = 50 + r2 * ux, by = 50 + r2 * uy;
@@ -205,6 +214,10 @@
       return o2.join(" ");
     }
 
+    /* أُعيدت الوردة إلى بنائها السابق (حلزون ناعم + بتلات محيطية).
+       بناء «Spiral Rose» بالبتلات المنتفخة على طول الحلزون جُرّب ثلاث
+       مرات بمعاملات مختلفة وبقيت البتلات ملتصقة بالحلزون لا تُقرأ
+       كوردة — الأقل ادّعاءً أصدق من الأكثر تعقيداً. */
     if (kind === "rose") {
       /* وردة من أعلى: حلزون ناعم في القلب وبتلات مستديرة حوله.
          الأقواس المتغيّرة نصف القطر (A) أعطت شكلاً مشوّهاً — استُبدلت بخطّ حلزوني. */
@@ -365,7 +378,7 @@
     /* معرّف فريد لكل رسم: `<use href="#id">` يلتقط **أول** عنصر بهذا المعرّف
        في المستند كلّه. معرّف ثابت يجعل كل الأشكال على صفحة واحدة نسخةً من
        أوّلها — حدث فعلاً وشوهد في شبكة المعاينة. */
-    var id = "m" + (state.seed >>> 0).toString(36) + kind + (state.mode || "r") + (state.idx || "");
+    var id = "m" + (++uid).toString(36) + (state.seed >>> 0).toString(36) + kind;
     /* السماكة تُقسَم على النسبة حين تصغر الزخرفة على الورقة، وإلا بدت
        ثمانيةُ زخارف أثخنَ من واحدة رغم أن القيمة نفسها. */
     var sw = (state.weight === undefined ? 1.6 : state.weight / 10);
