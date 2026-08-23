@@ -1,0 +1,57 @@
+{
+  "_comment": "ALTAYEB GUARDIAN — إعدادات أوراقنا. الملف الوحيد الذي يُعدَّل.",
+  "creator": {
+    "name_en": "Artist Altayeb Amer",
+    "name_ar": "الفنان الطيب عامر",
+    "signature": "© Artist Altayeb Amer",
+    "url": "https://007.gallery",
+    "contact": "artist.and.love@gmail.com"
+  },
+  "project": {
+    "name": "أوراقنا | Awraqna",
+    "name_ar": "أوراقنا",
+    "site": "https://awraqna.com",
+    "version": "5.0.0",
+    "year": 2026,
+    "license": "All rights reserved"
+  },
+  "domains": [
+    "awraqna.com",
+    "www.awraqna.com",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "layers": {
+    "identity": true,
+    "integrity": true,
+    "domain_guard": true,
+    "visible_signature": true,
+    "output_provenance": false,
+    "structured_data": true
+  },
+  "signature_ui": {
+    "selectors": [
+      ".site-footer .wrap",
+      "footer .wrap",
+      "footer"
+    ],
+    "mode": "append",
+    "color": "#6b7488",
+    "text_ar": "صُنع بعناية — {name_ar}",
+    "text_en": "Crafted by {name_en}"
+  },
+  "structured_data": {
+    "type": "WebApplication",
+    "category": "EducationalApplication",
+    "price": "0",
+    "currency": "USD",
+    "languages": [
+      "ar",
+      "en"
+    ]
+  },
+  "provenance": {
+    "claim_user_content": false,
+    "comment": "Worksheets are generated in the browser — no upload, no server."
+  }
+}
