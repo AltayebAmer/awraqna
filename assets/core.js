@@ -58,6 +58,13 @@
            (sub ? '<small>' + esc(sub) + "</small>" : "") + "</div>" + fields + "</div>";
   }
 
+  /* سطر النسبة على الورق: الورقة تنتقل من يد إلى يد مطبوعةً،
+     فهو الوسيلة الوحيدة ليعرف من يمسكها من أين جاءت. صغير ولا يزاحم. */
+  function credit() {
+    return '<div class="sheet-credit"><span class="cr-site">awraqna.com</span>' +
+           '<span class="cr-owner">' + (EN() ? "Artist Altayeb Amer" : "الفنان الطيب عامر") + "</span></div>";
+  }
+
   /* ── التخزين المحلي: مفتاح مستقل لكل مجال ───────────────── */
   function load(key, state) {
     try {
@@ -145,13 +152,14 @@
       }
       var title = T(out.title), sub = T(out.sub);
       /* بعض المجالات (ورق المعلّم) ورقتها هي المنتج نفسه ⇒ لا ترويسة. */
-      $("sheet").innerHTML = (out.head === false ? "" : sheetHead(title, sub, false, state.seed)) + out.sheet;
+      $("sheet").innerHTML = (out.head === false ? "" : sheetHead(title, sub, false, state.seed)) +
+                             out.sheet + credit();
 
       var ael = $("answers");
       var showAns = cfg.answers !== false && state.withAnswers && out.answers;
       ael.hidden = !showAns;
       ael.innerHTML = showAns
-        ? sheetHead(EN() ? "Answer Key" : "صفحة الإجابات", sub, true, state.seed) + out.answers
+        ? sheetHead(EN() ? "Answer Key" : "صفحة الإجابات", sub, true, state.seed) + out.answers + credit()
         : "";
 
       var note = $("seedNote");
@@ -181,5 +189,5 @@
   }
 
   return { rng: rng, randInt: randInt, shuffle: shuffle, mount: mount,
-           esc: esc, T: T, EN: EN, log: log, sheetHead: sheetHead, version: "2.0" };
+           esc: esc, T: T, EN: EN, log: log, sheetHead: sheetHead, credit: credit, version: "2.1" };
 });

@@ -91,6 +91,17 @@
 .f-ruqaa{--fs:0.85;font-family:"Aref Ruqaa","Baghdad","Geeza Pro",serif}
 .f-kufi{--fs:1.12;font-family:"Reem Kufi","Noto Kufi Arabic","KufiStandardGK","Geeza Pro",sans-serif}
 .f-thuluth{--fs:1.08;font-family:"Diwan Thuluth","DecoType Thuluth","Amiri","Geeza Pro",serif}
+@font-face{font-family:"Caveat";src:url("fonts/caveat.woff2") format("woff2");
+  font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:"Great Vibes";src:url("fonts/great-vibes.woff2") format("woff2");
+  font-weight:400;font-style:normal;font-display:swap}
+
+/* الخطوط الإنجليزية: حديث (نظام) · يدوي (Caveat) · خطّي (Great Vibes).
+   الخطّي معامله **أصغر** من واحد رغم صغر ارتفاع حبره: زوائده (swashes)
+   تمتدّ أفقياً بعيداً فتفيض الخلية عند 1.30 — جُرّب وشوهد الحرف مقصوصاً. */
+.f-modern{--fs:1;font-family:"Helvetica Neue",Arial,system-ui,sans-serif}
+.f-handwriting{--fs:1.05;font-family:"Caveat","Bradley Hand","Segoe Print",cursive}
+.f-calligraphy{--fs:0.82;font-family:"Great Vibes","Snell Roundhand","Apple Chancery",cursive}
 .f-auto{--fs:1;font-family:inherit}
 
 /* ---------- الألغاز وأوراق المعلّم ---------- */
@@ -133,12 +144,21 @@
 .tr-model,.tr-ghost{font-size:calc(34px * var(--fs,1));line-height:1.18;flex:none}
 .tr-model{color:#111;font-weight:700}
 .tr-ghost{color:#e0e0e0;-webkit-text-stroke:0.7px #b4b4b4}
-.cl-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:200mm;text-align:center}
-/* 130mm × أكبر معامل (1.18) × سطر 1.2 = 184mm ⇒ يسع الصفحة مع الترويسة.
-   جُرّب 150mm فصارت صفحتين مع خط النسخ. */
-.cl-big{font-size:calc(130mm * var(--fs,1));line-height:1.2;color:#fbfbfb;-webkit-text-stroke:1.4px #111}
-.cl-name{font-size:22px;font-weight:800;color:#333;margin-top:6px}
+.cl-grid{display:grid;gap:8px}
+.cl-grid[data-per="2"]{grid-template-rows:1fr 1fr}
+.cl-grid[data-per="4"]{grid-template-columns:1fr 1fr}
+.cl-cell{position:relative;display:flex;align-items:center;justify-content:center;
+  border:1px dashed #ddd;border-radius:8px;break-inside:avoid;page-break-inside:avoid;
+  min-width:0;overflow:hidden}
+/* اسم الحرف في الزاوية لا تحته: داخل مساحة التلوين يزاحم الطفل ويُلوَّن سهواً. */
+.cl-name{position:absolute;top:6px;inset-inline-start:10px;font-size:15px;font-weight:800;
+  color:#8a8a8a;font-family:'Segoe UI',system-ui,sans-serif;letter-spacing:.3px}
+/* الحجم يتبع عدد الحروف في الورقة. جُرّب 150mm لحرف واحد فصارت صفحتين. */
+.cl-big{line-height:1.05;color:#fbfbfb;-webkit-text-stroke:1.4px #111;display:block}
+.cl-grid[data-per="1"] .cl-big{font-size:calc(118mm * var(--fs,1))}
+.cl-grid[data-per="2"] .cl-big{font-size:calc(78mm * var(--fs,1))}
+.cl-grid[data-per="4"] .cl-big{font-size:calc(52mm * var(--fs,1))}
+
 
 /* ---------- البرمجة والعلوم والوقت ---------- */
 .cd-line{flex:1;min-width:0;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:14px;
@@ -173,6 +193,12 @@
 .cal td{border:1px solid #999;height:31mm;vertical-align:top;padding:3px}
 .cal-n{font-size:12px;font-weight:700;color:#444}
 
+/* ---------- سطر النسبة على الورق ---------- */
+.sheet-credit{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  margin-top:9px;padding-top:4px;border-top:1px solid #e8e8e8;
+  font-size:8.5px;letter-spacing:.2px;color:#9a9a9a}
+.sheet-credit .cr-site{font-family:'SF Mono',Menlo,Consolas,monospace;direction:ltr}
+
 /* ---------- الموبايل ---------- */
 @media (max-width:640px){
   .ctl-label{flex-basis:100%}
@@ -184,7 +210,10 @@
   .lt-grid[data-per="4"]{grid-template-columns:1fr}
   .lt-big{font-size:calc(34px * var(--fs,1))}
   .tr-model,.tr-ghost{font-size:calc(26px * var(--fs,1))}
-  .cl-big{font-size:calc(56vw * var(--fs,1))}
+  .cl-grid[data-per="4"]{grid-template-columns:1fr}
+  .cl-grid[data-per="1"] .cl-big{font-size:calc(52vw * var(--fs,1))}
+  .cl-grid[data-per="2"] .cl-big{font-size:calc(38vw * var(--fs,1))}
+  .cl-grid[data-per="4"] .cl-big{font-size:calc(30vw * var(--fs,1))}
   .a-grid{grid-template-columns:repeat(3,1fr)}
   .cd-grid-3,.tm-grid{grid-template-columns:repeat(2,1fr)}
   .cal td{height:16mm}
@@ -220,6 +249,9 @@
   .q-item{padding-bottom:8px;border-bottom-color:#d0d0d0}
   .sheet-head{border-bottom-color:#000}
   .a-grid div{border-bottom-color:#bbb}
+  /* على الورق يُطبع بالرمادي الداكن ليُقرأ بعد التصوير والنسخ. */
+  .sheet-credit{color:#6f6f6f;border-top-color:#d5d5d5;font-size:7.5pt;
+    margin-top:6px;padding-top:3px}
   /* الورقة الكاملة (ورق المعلّم) تملأ مساحة الطباعة بلا حشو. */
   .paper{width:186mm;height:auto}
   .puz-grid{gap:12px}
@@ -228,7 +260,15 @@
   .art-wrap{min-height:236mm;align-items:center}
   .art-svg{max-height:236mm}
   .lt-block{border-color:#ccc}
-  .cl-wrap{min-height:210mm}
+  /* على الورق تُمَطّ الشبكة لتملأ مساحة الطباعة بعد الترويسة وسطر النسبة،
+     وإلا بقي ثلثا الورقة فارغاً — وهو ما حدث قبل الضبط. */
+  .cl-grid{height:228mm}
+  .cl-grid[data-per="4"]{grid-template-rows:1fr 1fr}
+  .cl-cell{border-color:#e2e2e2}
+  .cl-grid[data-per="1"] .cl-big{font-size:calc(120mm * var(--fs,1))}
+  .cl-grid[data-per="2"] .cl-big{font-size:calc(82mm * var(--fs,1))}
+  .cl-grid[data-per="4"] .cl-big{font-size:calc(58mm * var(--fs,1))}
+  .cl-name{font-size:11pt;color:#777}
   .cd-code{background:none;border:1px solid #ddd}
   .cd-tbl th{background:none}
   .cal th{background:none}

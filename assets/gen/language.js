@@ -98,22 +98,33 @@
   /* الخطوط: أسماء عائلات موجودة على macOS/iOS، وكل واحدة تنتهي باحتياط.
      على ويندوز/أندرويد يسقط الاختيار إلى الاحتياط ⇒ الشكل يبقى صحيحاً
      لكن ليس بقواعد الخط المطلوب. الحل الجذري ملفات خطوط محلية (انظر ROADMAP). */
-  /* النسخ والرقعة والكوفي ملفات محلية بترخيص OFL ⇒ متطابقة على كل جهاز.
-     الثلث يعتمد على خط النظام (لا يوجد خط ثلث حرّ) ⇒ يظهر بالاحتياط
-     خارج macOS. لا تعِد ترتيب هذه القائمة بلا سبب: هي ترتيب الشيوع في التعليم. */
-  var FONTS = {
+  /* مجموعتا خطوط مستقلتان: العربية تُطبَّق على الحروف والأرقام الهندية،
+     والإنجليزية على الحروف اللاتينية والأرقام العربية. الزرّان يظهران في
+     النسختين معاً — المعلّم قد يضبط الاثنين ثم يبدّل الأبجدية.
+     كلها ملفات OFL محلية عدا الثلث (لا يوجد خط ثلث حرّ) والافتراضي. */
+  var FONTS_AR = {
     naskh:   { ar: "نسخ",     en: "Naskh" },
     ruqaa:   { ar: "رقعة",    en: "Ruq\u02bfah" },
     kufi:    { ar: "كوفي",    en: "Kufi" },
     thuluth: { ar: "ثلث",     en: "Thuluth" },
     auto:    { ar: "افتراضي", en: "Default" }
   };
+  var FONTS_EN = {
+    modern:      { ar: "حديث",   en: "Modern" },
+    handwriting: { ar: "يدوي",   en: "Handwriting" },
+    calligraphy: { ar: "خطّي",    en: "Calligraphy" },
+    auto:        { ar: "افتراضي", en: "Default" }
+  };
+  var isArabicScript = function (sc) { return sc === "ar" || sc === "ar-num"; };
 
+  /* التسمية ليست تفصيلاً: ٠١٢٣ تُسمّى في العربية «أرقاماً هندية»
+     وتُسمّى في الإنجليزية Arabic numerals، و 0123 عكسها تماماً.
+     الخلط بينهما يعلّم الطفل خطأً تاريخياً شائعاً. */
   var TITLES = {
     "ar":     { ar: "تتبّع الحروف العربية", en: "Arabic letter tracing" },
     "en":     { ar: "تتبّع الحروف الإنجليزية", en: "English letter tracing" },
-    "ar-num": { ar: "تتبّع الأرقام العربية", en: "Arabic-Indic numeral tracing" },
-    "en-num": { ar: "تتبّع الأرقام", en: "Numeral tracing" }
+    "ar-num": { ar: "تتبّع الأرقام الهندية", en: "Arabic numeral tracing ٠-٩" },
+    "en-num": { ar: "تتبّع الأرقام العربية", en: "Western numeral tracing 0-9" }
   };
   var COLOR_TITLES = {
     "ar":     { ar: "لوّن الحرف", en: "Colour the letter" },
@@ -129,36 +140,45 @@
     var list = alphabet(script);
     var r = rng(state.seed);
     var start = Math.floor(r() * list.length);
+    var per = Number(state.per) || 2;
 
-    var font = FONTS[state.font] ? state.font : "auto";
+    /* الأبجدية هي التي تختار مجموعة الخطوط، لا العكس. */
+    var arabic = isArabicScript(script);
+    var set = arabic ? FONTS_AR : FONTS_EN;
+    var font = set[arabic ? state.fontAr : state.fontEn] ? (arabic ? state.fontAr : state.fontEn)
+             : (arabic ? "naskh" : "modern");
     var fc = " f-" + font;
+    var fname = set[font];
 
     if (state.mode === "color") {
-      var ch = list[start];
-      var name = script === "ar" && NAMES[ch] ? '<div class="cl-name">' + esc(NAMES[ch]) + "</div>" : "";
+      /* «لكل ورقة» كان يُتجاهَل في التلوين فيظهر حرف واحد دائماً — عطب مُبلَّغ. */
+      var cells = [], i, ch, nm;
+      for (i = 0; i < per; i++) {
+        ch = list[(start + i) % list.length];
+        nm = arabic && NAMES[ch] ? '<span class="cl-name">' + esc(NAMES[ch]) + "</span>" : "";
+        cells.push('<div class="cl-cell">' + nm + '<span class="cl-big">' + esc(ch) + "</span></div>");
+      }
       return {
         title: COLOR_TITLES[script],
         sub: {
-          ar: "لوّن داخل الحرف" + (script === "ar" ? " · خط " + FONTS[font].ar : ""),
-          en: "Colour inside the outline" + (script === "ar" ? " · " + FONTS[font].en : "")
+          ar: "لوّن داخل الحرف · خط " + fname.ar,
+          en: "Colour inside the outline · " + fname.en
         },
-        sheet: '<div class="cl-wrap' + fc + '"><span class="cl-big">' + esc(ch) + "</span>" + name + "</div>",
+        sheet: '<div class="cl-grid' + fc + '" data-per="' + per + '">' + cells.join("") + "</div>",
         answers: ""
       };
     }
 
-    var per = Number(state.per) || 2;
-    var blocks = [], i;
-    for (i = 0; i < per; i++)
-      blocks.push(letterBlock(list[(start + i) % list.length], script, per <= 2, ROWS[per] || 4));
+    var blocks = [], k;
+    for (k = 0; k < per; k++)
+      blocks.push(letterBlock(list[(start + k) % list.length], script, per <= 2, ROWS[per] || 4));
     return {
       title: TITLES[script],
       sub: {
         /* المثنّى في العربية ليس جمعاً: «حرفان» لا «2 حروف». */
         ar: (per === 1 ? "حرف واحد" : per === 2 ? "حرفان" : per + " حروف") +
-            (per <= 2 && script === "ar" ? " · بأشكاله" : " · تتبّع") +
-            (script === "ar" ? " · خط " + FONTS[font].ar : ""),
-        en: (per === 1 ? "One letter" : per + " letters")
+            (per <= 2 && script === "ar" ? " · بأشكاله" : " · تتبّع") + " · خط " + fname.ar,
+        en: (per === 1 ? "One letter" : per + " letters") + " · " + fname.en
       },
       sheet: '<div class="lt-grid' + fc + '" data-per="' + per + '">' + blocks.join("") + "</div>",
       answers: ""
@@ -166,5 +186,6 @@
   }
 
   return { render: render, forms: forms, alphabet: alphabet, NAMES: NAMES,
-           NON_CONNECT: NON_CONNECT, FONTS: FONTS, ROW_FILL: ROW_FILL };
+           NON_CONNECT: NON_CONNECT, FONTS_AR: FONTS_AR, FONTS_EN: FONTS_EN,
+           isArabicScript: isArabicScript, ROW_FILL: ROW_FILL };
 });

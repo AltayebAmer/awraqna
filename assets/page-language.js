@@ -1,32 +1,35 @@
-/* GUARDIAN:BEGIN
-   🛡️ أوراقنا | Awraqna — © 2026 Artist Altayeb Amer
-   الفنان الطيب عامر  ·  https://awraqna.com
-   Protected by ALTAYEB GUARDIAN v4.0
-   GUARDIAN:END */
 /* أوراقنا — ربط صفحة الحروف بالنواة. */
 (function () {
   "use strict";
   Core.mount({
     key: "language",
     answers: false,
-    state: { script: "ar", mode: "trace", per: 2, font: "naskh" },
+    state: { script: "ar", mode: "trace", per: 2, fontAr: "naskh", fontEn: "modern" },
     controls: [
       { k: "script", label: { ar: "الأبجدية", en: "Alphabet" }, opts: [
-        { v: "ar",     ar: "حروف عربية",   en: "Arabic letters" },
+        { v: "ar",     ar: "حروف عربية",    en: "Arabic letters" },
         { v: "en",     ar: "حروف إنجليزية", en: "English letters" },
-        { v: "ar-num", ar: "أرقام عربية",   en: "Arabic-Indic ٠-٩" },
-        { v: "en-num", ar: "أرقام 0-9",     en: "Numerals 0-9" }
+        /* ٠١٢٣ = «هندية» بالعربية و Arabic بالإنجليزية، و 0123 عكسها. */
+        { v: "ar-num", ar: "أرقام هندية ٠-٩", en: "Arabic numerals ٠-٩" },
+        { v: "en-num", ar: "أرقام عربية 0-9", en: "Western numerals 0-9" }
       ] },
       { k: "mode", label: { ar: "النشاط", en: "Activity" }, opts: [
         { v: "trace", ar: "تتبّع", en: "Trace" },
         { v: "color", ar: "تلوين", en: "Colour" }
       ] },
-      { k: "font", label: { ar: "الخط", en: "Script style" }, opts: [
+      /* الزرّان يظهران دائماً في النسختين — المفعَّل منهما تختاره الأبجدية. */
+      { k: "fontAr", label: { ar: "أنواع الخطوط العربية", en: "Arabic script style" }, opts: [
         { v: "naskh",   ar: "نسخ",     en: "Naskh" },
-        { v: "ruqaa",   ar: "رقعة",    en: "Ruq\u02bfah" },
+        { v: "ruqaa",   ar: "رقعة",    en: "Ruqʿah" },
         { v: "kufi",    ar: "كوفي",    en: "Kufi" },
         { v: "thuluth", ar: "ثلث",     en: "Thuluth" },
         { v: "auto",    ar: "افتراضي", en: "Default" }
+      ] },
+      { k: "fontEn", label: { ar: "أنواع الخطوط الإنجليزية", en: "English script style" }, opts: [
+        { v: "modern",      ar: "حديث",    en: "Modern" },
+        { v: "handwriting", ar: "يدوي",    en: "Handwriting" },
+        { v: "calligraphy", ar: "خطّي",     en: "Calligraphy" },
+        { v: "auto",        ar: "افتراضي", en: "Default" }
       ] },
       { k: "per", label: { ar: "لكل ورقة", en: "Per page" }, opts: [
         { v: 1, ar: "حرف واحد", en: "One" },
