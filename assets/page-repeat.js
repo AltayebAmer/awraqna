@@ -4,12 +4,18 @@
   var isR = function (s) { return s.mode === "radial"; };
   var isG = function (s) { return s.mode === "grid"; };
   var isM = function (s) { return s.mode === "mirror"; };
+  var isSp = function (s) { return s.shape === "spiral"; };
+  var isSw = function (s) { return s.shape === "swirl"; };
+  var isPh = function (s) { return s.shape === "phyllo"; };
+  var isFilled = function (s) { return s.shape === "swirl" || s.shape === "phyllo"; };
 
   Core.mount({
     key: "repeat",
     answers: false,
     state: { shape: "petal", mode: "radial", count: 16, radius: 0,
-             spin: 0, cols: 5, rows: 6, axes: 2, size: 140, weight: 16, per: 1, fade: 0 },
+             spin: 0, cols: 5, rows: 6, axes: 2, size: 140, weight: 16, per: 1, fade: 0,
+             spR: 44, spDecay: 88, spSegs: 14, spDir: "cw", spLeaves: false,
+             swBlades: 16, swTwist: 150, swInner: 8, phCount: 260, solid: true },
     controls: [
       { k: "shape", label: { ar: "الشكل", en: "Shape" },
         opts: RepeatGen.SHAPES.map(function (s) {
@@ -21,6 +27,36 @@
         { v: "radial", ar: "شعاعي", en: "Radial" },
         { v: "grid",   ar: "شبكي",  en: "Grid" },
         { v: "mirror", ar: "مرآوي", en: "Mirror" }
+      ] },
+
+      /* مساطر أداة الحلزون — تظهر مع الشكل الحلزوني وحده،
+         تماماً كلوحة Spiral Tool في Illustrator. */
+      { k: "spR",     label: { ar: "نصف قطر الحلزون", en: "Spiral radius" },
+        type: "range", min: 12, max: 48, showIf: isSp },
+      { k: "spDecay", label: { ar: "الاضمحلال", en: "Decay" },
+        type: "range", min: 60, max: 97, unit: "%", showIf: isSp },
+      { k: "spSegs",  label: { ar: "عدد القطاعات", en: "Segments" },
+        type: "range", min: 3, max: 40, showIf: isSp },
+      { k: "spDir",   label: { ar: "اتجاه اللف", en: "Direction" }, keepSeed: true, showIf: isSp, opts: [
+        { v: "cw",  ar: "مع العقارب", en: "Clockwise" },
+        { v: "ccw", ar: "عكس العقارب", en: "Counter-CW" }
+      ] },
+      { k: "spLeaves", label: { ar: "أوراق على الحلزون", en: "Leaves" }, keepSeed: true, showIf: isSp, opts: [
+        { v: false, ar: "بلا أوراق", en: "None" },
+        { v: true,  ar: "بأوراق",   en: "With leaves" }
+      ] },
+
+      { k: "swBlades", label: { ar: "عدد الشفرات", en: "Blades" },
+        type: "range", min: 3, max: 48, showIf: isSw },
+      { k: "swTwist",  label: { ar: "زاوية اللف", en: "Twist" },
+        type: "range", min: 20, max: 360, step: 5, unit: "°", showIf: isSw },
+      { k: "swInner",  label: { ar: "الفراغ الداخلي", en: "Inner hole" },
+        type: "range", min: 0, max: 34, showIf: isSw },
+      { k: "phCount",  label: { ar: "عدد النقاط", en: "Dots" },
+        type: "range", min: 40, max: 600, step: 10, showIf: isPh },
+      { k: "solid",    label: { ar: "التعبئة", en: "Fill" }, keepSeed: true, showIf: isFilled, opts: [
+        { v: true,  ar: "مصمت",  en: "Solid" },
+        { v: false, ar: "مفرّغ", en: "Outline" }
       ] },
 
       { k: "count",  label: { ar: "عدد التكرار", en: "Copies" },
@@ -39,7 +75,7 @@
         type: "range", min: 2, max: 12, showIf: isM },
 
       { k: "size",   label: { ar: "حجم الشكل", en: "Shape size" },
-        type: "range", min: 20, max: 180, unit: "%" },
+        type: "range", min: 20, max: 320, unit: "%" },
       { k: "weight", label: { ar: "سماكة الخط", en: "Line weight" },
         type: "range", min: 4, max: 60, step: 2 },
       { k: "per",    label: { ar: "زخارف لكل ورقة", en: "Per page" }, keepSeed: true, opts: [

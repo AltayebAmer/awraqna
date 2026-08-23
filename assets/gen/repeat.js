@@ -26,7 +26,7 @@
   /* ══════ العناصر السبعة ══════
      كل عنصر مرسوم داخل مربّع 100×100 مركزه (50,50)، ويقبل معاملات
      من العشوائية فيختلف شكله بين توليد وآخر دون أن يتغيّر نوعه. */
-  function pathOf(kind, r) {
+  function pathOf(kind, r, st) {
     var i, th, pts = [], d;
     var jitter = 0.85 + r() * 0.3;
 
@@ -72,6 +72,99 @@
         var rr = (44 - i * (44 / (k + 0.6))) * jitter;
         out.push("M" + f2(50 - rr) + " 50 a" + f2(rr) + " " + f2(rr) + " 0 1 0 " + f2(rr * 2) +
                  " 0 a" + f2(rr) + " " + f2(rr) + " 0 1 0 " + f2(-rr * 2) + " 0 Z");
+      }
+      return out.join(" ");
+    }
+
+    /* ══ الدوّامة — شفرات حلزونية متناقصة العرض ══
+       كل شفرة محصورة بين قوسين حلزونيين تفصلهما زاوية تضيق نحو الطرف،
+       فتنشأ الشفرة المدبَّبة. هذا هو أثر Swirl في المراجع البصرية. */
+    if (kind === "swirl") {
+      var sw2 = st || {};
+      var N = sw2.swBlades === undefined ? 16 : sw2.swBlades;
+      var twist = (sw2.swTwist === undefined ? 150 : sw2.swTwist) * Math.PI / 180;
+      var ri = (sw2.swInner === undefined ? 8 : sw2.swInner);
+      var ro = 46 * jitter;
+      var gap = (PI2 / N) * 0.92;
+      var o7 = [], b, u2, S = 30;
+      for (b = 0; b < N; b++) {
+        var a0 = (b / N) * PI2 - Math.PI / 2, pts7 = [];
+        /* الحافة الأمامية: من الداخل إلى الطرف. */
+        for (u2 = 0; u2 <= S; u2++) {
+          var t7 = u2 / S;
+          var rd = ri + (ro - ri) * t7, an = a0 + twist * t7;
+          pts7.push(f2(50 + rd * Math.cos(an)) + " " + f2(50 + rd * Math.sin(an)));
+        }
+        /* الحافة الخلفية: من الطرف إلى الداخل، والانفراج يتّسع كلما اقتربنا
+           من المركز ⇒ شفرة عريضة عند القلب مدبَّبة عند الحافة. */
+        for (u2 = 0; u2 <= S; u2++) {
+          var t8 = u2 / S;
+          var rd2 = ri + (ro - ri) * (1 - t8);
+          var an2 = a0 + twist * (1 - t8) + gap * t8;
+          pts7.push(f2(50 + rd2 * Math.cos(an2)) + " " + f2(50 + rd2 * Math.sin(an2)));
+        }
+        o7.push("M" + pts7.join(" L") + " Z");
+      }
+      return o7.join(" ");
+    }
+
+    /* ══ النقاط الحلزونية — توزيع فيلوتاكسي ══
+       زاوية ذهبية 137.5° ونصف قطر √i: هو ترتيب بذور دوّار الشمس نفسه،
+       وحجم النقطة يتبع بُعدها فينشأ تدرّج بصري. */
+    if (kind === "phyllo") {
+      var ph = st || {};
+      var NP = ph.phCount === undefined ? 260 : ph.phCount;
+      var GA = 137.507764 * Math.PI / 180;
+      var Rm = 46 * jitter, o8 = [], i8;
+      for (i8 = 1; i8 <= NP; i8++) {
+        var f8 = Math.sqrt(i8 / NP);
+        var rr8 = Rm * f8, an8 = i8 * GA;
+        /* حجم النقطة يتناسب عكسياً مع جذر عددها، وإلا التحمت
+           النقاط عند الكثافة العالية فصارت قرصاً أسود. */
+        var dr8 = (0.5 + 2.4 * f8) * Math.sqrt(260 / NP);
+        var x8 = 50 + rr8 * Math.cos(an8), y8 = 50 + rr8 * Math.sin(an8);
+        o8.push("M" + f2(x8 - dr8) + " " + f2(y8) + " a" + f2(dr8) + " " + f2(dr8) + " 0 1 0 " +
+                f2(dr8 * 2) + " 0 a" + f2(dr8) + " " + f2(dr8) + " 0 1 0 " + f2(-dr8 * 2) + " 0 Z");
+      }
+      return o8.join(" ");
+    }
+
+    /* ══ الحلزون — على نهج Spiral Tool في Illustrator ══
+       حلزون لوغاريتمي: نصف القطر يُضرب في معامل الاضمحلال عند كل ربع دورة.
+       المعاملات الأربعة هي نفسها: نصف القطر · الاضمحلال · عدد القطاعات · الاتجاه.
+       ويُضاف خيار الأوراق ليصبح غصناً متسلّقاً — وهو غرض الزخرفة النباتية. */
+    if (kind === "spiral") {
+      var sp = st || {};
+      var R = (sp.spR === undefined ? 44 : sp.spR) * jitter;
+      var decay = (sp.spDecay === undefined ? 88 : sp.spDecay) / 100;
+      var segs = sp.spSegs === undefined ? 14 : sp.spSegs;
+      var dir = sp.spDir === "ccw" ? -1 : 1;
+      var out = [], t, pts = [], step = 0.06;
+      for (t = 0; t <= segs; t += step) {
+        var ang = t * (Math.PI / 2) * dir - Math.PI / 2;
+        var rr = R * Math.pow(decay, t);
+        pts.push(f2(50 + rr * Math.cos(ang)) + " " + f2(50 + rr * Math.sin(ang)));
+      }
+      out.push("M" + pts.join(" L"));
+
+      if (sp.spLeaves) {
+        /* الورقة تنبت **شعاعياً إلى الخارج** لا مماسّاً: التوجيه المماسّي
+           يجعلها تعبر الحلزون نفسه فينشأ تشابك لا غصن — جُرّب وشوهد.
+           وتُحذف أوراق القلب لأن نصف القطر هناك أصغر من الورقة. */
+        var k;
+        for (k = 1; k <= segs; k++) {
+          var a2 = k * (Math.PI / 2) * dir - Math.PI / 2;
+          var r2 = R * Math.pow(decay, k);
+          if (r2 < R * 0.22) break;
+          var ux = Math.cos(a2), uy = Math.sin(a2);
+          var bx = 50 + r2 * ux, by = 50 + r2 * uy;
+          var lv = r2 * 0.5;
+          var tipx = bx + lv * 1.5 * ux, tipy = by + lv * 1.5 * uy;
+          var px = -uy * lv * 0.5, py = ux * lv * 0.5;
+          out.push("M" + f2(bx) + " " + f2(by) +
+                   " Q" + f2((bx + tipx) / 2 + px) + " " + f2((by + tipy) / 2 + py) + " " + f2(tipx) + " " + f2(tipy) +
+                   " Q" + f2((bx + tipx) / 2 - px) + " " + f2((by + tipy) / 2 - py) + " " + f2(bx) + " " + f2(by) + " Z");
+        }
       }
       return out.join(" ");
     }
@@ -193,7 +286,8 @@
   }
 
   var SHAPES = ["star", "petal", "rhombus", "arc", "triangle", "rings", "drop",
-              "leaf", "flower", "rose", "tulip", "branch", "fern"];
+              "leaf", "flower", "rose", "tulip", "branch", "fern",
+              "spiral", "swirl", "phyllo"];
   var SHAPE_NAMES = {
     star:     { ar: "نجمة",  en: "Star" },
     petal:    { ar: "بتلة",  en: "Petal" },
@@ -207,7 +301,10 @@
     rose:     { ar: "وردة",  en: "Rose" },
     tulip:    { ar: "خزامى", en: "Tulip" },
     branch:   { ar: "غصن",   en: "Branch" },
-    fern:     { ar: "سعفة",  en: "Fern" }
+    fern:     { ar: "سعفة",  en: "Fern" },
+    spiral:   { ar: "حلزون",  en: "Spiral" },
+    swirl:    { ar: "دوّامة",  en: "Swirl" },
+    phyllo:   { ar: "نقاط حلزونية", en: "Spiral dots" }
   };
 
   /* ══════ أوضاع التكرار الثلاثة ══════
@@ -254,10 +351,17 @@
     return out.join("");
   }
 
+  /* الدوّامة والنقاط تُملأ افتراضاً — بلا تعبئة تفقد أثرها البصري.
+     ويبقى الخيار مفتوحاً لورقة تلوين مفرّغة. */
+  function fillOf(kind, state) {
+    if (kind !== "swirl" && kind !== "phyllo") return "none";
+    return state.solid === false ? "none" : "#111";
+  }
+
   function build(state) {
     var r = rng(state.seed);
     var kind = SHAPES.indexOf(state.shape) === -1 ? "star" : state.shape;
-    var d = pathOf(kind, r);
+    var d = pathOf(kind, r, state);
     /* معرّف فريد لكل رسم: `<use href="#id">` يلتقط **أول** عنصر بهذا المعرّف
        في المستند كلّه. معرّف ثابت يجعل كل الأشكال على صفحة واحدة نسخةً من
        أوّلها — حدث فعلاً وشوهد في شبكة المعاينة. */
@@ -290,8 +394,8 @@
     return '<svg class="rp-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" ' +
            'preserveAspectRatio="xMidYMid meet">' +
            '<rect width="400" height="400" fill="#fff"/>' +
-           '<defs><path id="' + id + '" d="' + d + '" fill="none" stroke="#111" stroke-width="' + sw +
-           '" stroke-linejoin="round"/></defs>' + guides + body + "</svg>";
+           '<defs><path id="' + id + '" d="' + d + '" fill="' + fillOf(kind, state) +
+           '" stroke="#111" stroke-width="' + sw + '" stroke-linejoin="round"/></defs>' + guides + body + "</svg>";
   }
 
   var MODES = {
