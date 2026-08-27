@@ -72,29 +72,36 @@
     var n = lv === "easy" ? 5 : (lv === "med" ? 8 : 12);
     var R = lv === "easy" ? 5 : 8, pts = [], seen = {}, i, k;
     for (i = 0; i < n * 3 && pts.length < n; i++) {
-      var x = ri(r, -R, R), y = ri(r, -R, R);
+      var x = ri(r, -R, R), y = ri(r, -VR(R), VR(R));
       k = x + "," + y;
       if (seen[k]) continue;
       seen[k] = 1; pts.push([x, y]);
     }
     return { R: R, pts: pts };
   }
+  /* الشبكة بنسبة الورقة لا مربّعة: المدى الرأسي أوسع بمقدار 253/186
+     فتمتلئ A4 بدل ترك ثلثها. المربّع كان يهدر الثلث السفلي — شوهد. */
+  var VR = function (R) { return Math.round(R * 1.36); };
+
   function axesSVG(R, pts, show) {
-    var S = R * 2, c = 10, W = S * c, g = [], i;
-    g.push('<rect width="' + W + '" height="' + W + '" fill="#fff"/>');
-    for (i = 0; i <= S; i++) {
+    var Ry = VR(R), c = 10, W = R * 2 * c, H = Ry * 2 * c, g = [], i;
+    g.push('<rect width="' + W + '" height="' + H + '" fill="#fff"/>');
+    for (i = 0; i <= R * 2; i++) {
       var major = i === R;
-      g.push('<line x1="' + i * c + '" y1="0" x2="' + i * c + '" y2="' + W +
-             '" stroke="' + (major ? "#111" : "#c8c8c8") + '" stroke-width="' + (major ? 0.6 : 0.2) + '"/>');
-      g.push('<line x1="0" y1="' + i * c + '" x2="' + W + '" y2="' + i * c +
+      g.push('<line x1="' + i * c + '" y1="0" x2="' + i * c + '" y2="' + H +
              '" stroke="' + (major ? "#111" : "#c8c8c8") + '" stroke-width="' + (major ? 0.6 : 0.2) + '"/>');
     }
+    for (i = 0; i <= Ry * 2; i++) {
+      var majY = i === Ry;
+      g.push('<line x1="0" y1="' + i * c + '" x2="' + W + '" y2="' + i * c +
+             '" stroke="' + (majY ? "#111" : "#c8c8c8") + '" stroke-width="' + (majY ? 0.6 : 0.2) + '"/>');
+    }
     if (show) pts.forEach(function (p, k) {
-      var X = (p[0] + R) * c, Y = (R - p[1]) * c;
+      var X = (p[0] + R) * c, Y = (Ry - p[1]) * c;
       g.push('<circle cx="' + X + '" cy="' + Y + '" r="1.7" fill="#c94f4f"/>');
       g.push('<text x="' + (X + 2.4) + '" y="' + (Y - 2) + '" font-size="3" fill="#c94f4f" font-family="Menlo,monospace">' + (k + 1) + "</text>");
     });
-    return '<svg class="sc-axes" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 ' + (W + 2) + " " + (W + 2) +
+    return '<svg class="sc-axes" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 ' + (W + 2) + " " + (H + 2) +
            '" preserveAspectRatio="xMidYMid meet">' + g.join("") + "</svg>";
   }
 
@@ -182,31 +189,34 @@
   };
 
   function plotSVG(fn, R) {
-    var c = 10, W = R * 2 * c, g = [], i;
-    g.push('<rect width="' + W + '" height="' + W + '" fill="#fff"/>');
+    var Ry = VR(R), c = 10, W = R * 2 * c, H = Ry * 2 * c, g = [], i;
+    g.push('<rect width="' + W + '" height="' + H + '" fill="#fff"/>');
     for (i = 0; i <= R * 2; i++) {
       var major = i === R;
-      g.push('<line x1="' + i * c + '" y1="0" x2="' + i * c + '" y2="' + W +
+      g.push('<line x1="' + i * c + '" y1="0" x2="' + i * c + '" y2="' + H +
              '" stroke="' + (major ? "#111" : "#d0d0d0") + '" stroke-width="' + (major ? .7 : .22) + '"/>');
+      if (i !== R && i % 2 === 0)
+        g.push('<text x="' + (i * c) + '" y="' + (Ry * c + 4.2) + '" font-size="3" text-anchor="middle" font-family="Menlo,monospace" fill="#666">' + num(i - R) + "</text>");
+    }
+    for (i = 0; i <= Ry * 2; i++) {
+      var majY = i === Ry;
       g.push('<line x1="0" y1="' + i * c + '" x2="' + W + '" y2="' + i * c +
-             '" stroke="' + (major ? "#111" : "#d0d0d0") + '" stroke-width="' + (major ? .7 : .22) + '"/>');
-      if (i !== R && i % 2 === 0) {
-        g.push('<text x="' + (i * c) + '" y="' + (R * c + 4.2) + '" font-size="3" text-anchor="middle" font-family="Menlo,monospace" fill="#666">' + num(i - R) + "</text>");
-        g.push('<text x="' + (R * c - 1.5) + '" y="' + (i * c + 1.2) + '" font-size="3" text-anchor="end" font-family="Menlo,monospace" fill="#666">' + num(R - i) + "</text>");
-      }
+             '" stroke="' + (majY ? "#111" : "#d0d0d0") + '" stroke-width="' + (majY ? .7 : .22) + '"/>');
+      if (i !== Ry && i % 2 === 0)
+        g.push('<text x="' + (R * c - 1.5) + '" y="' + (i * c + 1.2) + '" font-size="3" text-anchor="end" font-family="Menlo,monospace" fill="#666">' + num(Ry - i) + "</text>");
     }
     /* المنحنى يُقطَع عند القفزات (مثل 1/x عند الصفر) فلا يُرسم خطٌّ وهمي. */
     var runs = [], cur = [];
     for (i = 0; i <= R * 2 * 12; i++) {
       var x = -R + i / 12, y = fn(x);
-      if (!isFinite(y) || Math.abs(y) > R + 2) { if (cur.length > 1) runs.push(cur); cur = []; continue; }
-      cur.push(f2((x + R) * c) + "," + f2((R - y) * c));
+      if (!isFinite(y) || Math.abs(y) > Ry + 2) { if (cur.length > 1) runs.push(cur); cur = []; continue; }
+      cur.push(f2((x + R) * c) + "," + f2((Ry - y) * c));
     }
     if (cur.length > 1) runs.push(cur);
     runs.forEach(function (rn) {
       g.push('<polyline points="' + rn.join(" ") + '" fill="none" stroke="#111" stroke-width="1.1" stroke-linejoin="round"/>');
     });
-    return '<svg class="sc-axes" xmlns="http://www.w3.org/2000/svg" viewBox="-6 -3 ' + (W + 9) + " " + (W + 8) +
+    return '<svg class="sc-axes" xmlns="http://www.w3.org/2000/svg" viewBox="-6 -3 ' + (W + 9) + " " + (H + 8) +
            '" preserveAspectRatio="xMidYMid meet">' + g.join("") + "</svg>";
   }
 

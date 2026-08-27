@@ -358,7 +358,10 @@
   .cd-code{background:none;border:1px solid #ddd}
   .cd-tbl th{background:none}
   .cal th{background:none}
+  /* شبكة الإحداثيات تُطبع مع قائمة النقاط تحتها ⇒ سقف أقلّ.
+     راسم الدوال وحده يأخذ الارتفاع الكامل. */
   .sc-axes{max-width:176mm;max-height:225mm}
+  .sc-coord .sc-axes{max-height:188mm}
   .tm-clock{max-width:50mm}
 }
 
