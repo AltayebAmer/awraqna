@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# عمل موقوف غير مكتمل — يُنشر لكنه لا يُفهرَس.
+Disallow: /henna/
+
 Sitemap: https://awraqna.com/sitemap.xml
