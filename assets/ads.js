@@ -24,19 +24,25 @@
       body_en:"Background removal, upscaling, compression, QR — all in your browser.",
       cta_ar:"جرّب الأدوات", cta_en:"Try the tools",
       c1:"#14101f", c2:"#2e2350", accent:"#d4af37" },
-    { id:"midad", url:"https://midad.gallery", badge:"مِداد",
-      title_ar:"مِداد — فن الخط العربي", title_en:"Midad — Arabic Calligraphy",
-      body_ar:"استكشف روائع الخط العربي بلمسة رقمية عصرية.",
-      body_en:"Explore Arabic calligraphy with a modern digital touch.",
-      cta_ar:"اكتشف الآن", cta_en:"Discover now",
-      c1:"#1a1330", c2:"#3b2a6b", accent:"#c9a3ff" },
+    { id:"art", url:"https://altayebamer.com", badge:"الطيب عامر",
+      title_ar:"معرض الفنان الطيب عامر", title_en:"Altayeb Amer — Art Gallery",
+      body_ar:"سبعة تخصصات فنية: الخط، البورتريه، الخيول، التصميم والمزيد.",
+      body_en:"Seven artistic disciplines: calligraphy, portrait, horses, design and more.",
+      cta_ar:"زُر المعرض", cta_en:"Visit the gallery",
+      c1:"#2a1a10", c2:"#7a4620", accent:"#ffb27a" },
+    { id:"mawlidi", url:"https://mawlidi.com/arb/", badge:"مَوْلِدي",
+      title_ar:"مَوْلِدي — ميلادك في التقويم الهجري", title_en:"Mawlidi — Your Birthday in the Hijri Calendar",
+      body_ar:"احسب عمرك القمري، وحوّل التواريخ، وشاهد قمر ليلة ميلادك.",
+      body_en:"Your lunar age, date conversion, and the Moon of the night you were born.",
+      cta_ar:"احسب الآن", cta_en:"Calculate now",
+      c1:"#07071A", c2:"#2b2352", accent:"#e8c97a" },
     { id:"kashf", url:"#", badge:"كشف",
       title_ar:"كشف — تحليل ذكي للبيانات", title_en:"Kashf — Smart Data Insight",
       body_ar:"حوّل بياناتك إلى قرارات واضحة بالذكاء الاصطناعي.",
       body_en:"Turn your data into clear decisions with AI.",
       cta_ar:"جرّب مجاناً", cta_en:"Try free",
       c1:"#0d2a24", c2:"#12503f", accent:"#4fe0b0" },
-    { id:"quran", url:"#", badge:"القرآن الكريم",
+    { id:"quran", url:"https://qurankarem.org", badge:"القرآن الكريم",
       title_ar:"مصحف رقمي بتجربة صافية", title_en:"A Clean Digital Quran",
       body_ar:"قراءة مريحة بلا إعلانات ولا تشتيت.",
       body_en:"Comfortable reading — no ads, no distractions.",
@@ -71,7 +77,10 @@
     text-decoration:none;transition:.22s;position:relative}
   .ad-card:hover{filter:brightness(1.09)}
   .ad-card .ad-mark{flex:none;width:56px;height:56px;border-radius:14px;display:grid;place-items:center;
-    font-weight:900;font-size:13px;color:#0a0b0f;background:currentColor;box-shadow:0 6px 20px #0006}
+    font-weight:900;font-size:14px;background:currentColor;box-shadow:0 6px 20px #0006}
+  /* الحرف في عنصر مستقل: ضبط color على المربّع نفسه يجعل currentColor
+     مساوياً للحرف فيصير الشعار خلفيةً بلا حرف مرئي. */
+  .ad-card .ad-mark i{color:#0a0b0f;font-style:normal}
   .ad-card .ad-body{min-width:0;flex:1}
   .ad-card .ad-badge{font-size:11px;font-weight:800;opacity:.9;letter-spacing:.3px}
   .ad-card h4{font-size:19px;font-weight:900;color:#fff;margin:3px 0 5px;line-height:1.3}
@@ -118,7 +127,7 @@
       `<span class="ad-tag">${en ? "Sponsored" : "إعلان"}</span>` +
       `<a class="ad-card" href="${a.url}" target="_blank" rel="noopener sponsored"
           data-ad="${a.id}" style="color:${a.accent}">
-         <span class="ad-mark">${a.badge.slice(0, 2)}</span>
+         <span class="ad-mark"><i>${a.badge.slice(0, 2)}</i></span>
          <span class="ad-body">
            <span class="ad-badge">${a.badge}</span>
            <h4>${en ? a.title_en : a.title_ar}</h4>
