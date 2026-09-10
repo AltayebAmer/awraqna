@@ -45,6 +45,31 @@ Cloudflare يلتقط الدفعة ويبني خلال دقيقة تقريباً
 
 **حالياً هناك ٦ commits غير مرفوعة** — شغّل الأمر أعلاه.
 
+### إن فشل الدفع بـ `HTTP 400`
+
+```
+error: RPC failed; HTTP 400 curl 22 The requested URL returned error: 400
+send-pack: unexpected disconnect while reading sideband packet
+```
+
+ليس عطل شبكة ولا مشكلة صلاحيات. السبب أن `http.postBuffer` الافتراضي
+**١ ميجابايت**، والمستودع يحوي ~١ ميجا من صور المعاينة، فتُقطع الحزمة
+في منتصفها. أُصلح مرة واحدة على هذا الجهاز:
+
+```bash
+cd "/Users/altamer/Claude Workspace/awraqna"
+git config http.postBuffer 524288000
+git config http.version HTTP/1.1
+```
+
+الإعداد محليّ في `.git/config` ⇒ **يلزم تكراره إن استُنسخ المستودع على
+جهاز آخر**. رسالة `Everything up-to-date` التي تلي الخطأ مضلّلة — لا شيء
+رُفع فعلاً؛ تحقّق دائماً بـ:
+
+```bash
+git fetch origin && git log --oneline origin/main..HEAD | wc -l    # يجب أن يكون 0
+```
+
 ---
 
 ## الإعداد لأول مرة (مرة واحدة فقط)
