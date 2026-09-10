@@ -90,6 +90,39 @@
     catch (e) { log("warn", "تعذّر الحفظ محلياً", e.message); }
   }
 
+  /* ── روابط عميقة: /math/?skill=mul&count=40 ───────────────
+     صفحات الأوراق الثابتة تفتح المولّد على إعداد بعينه. القيمة تُقبل فقط
+     إن كانت **معلَنة في controls** — قيمة مثل skill=NOPE تمرّ نوعياً لكنها
+     تنتج ورقة فارغة، فالتحقق من النوع وحده لا يكفي. أسبقيتها فوق المحفوظ
+     محلياً: من ضغط رابط «ورقة ضرب» يريد الضرب، لا اختيار الأسبوع الماضي. */
+  function fromURL(state, controls) {
+    var q = location.search;
+    if (!q || q.length < 2) return;
+    var byKey = {};
+    (controls || []).forEach(function (c) { byKey[c.k] = c; });
+
+    q.slice(1).split("&").forEach(function (pair) {
+      var i = pair.indexOf("=");
+      if (i < 1) return;
+      var k = decodeURIComponent(pair.slice(0, i).replace(/\+/g, " "));
+      var v = decodeURIComponent(pair.slice(i + 1).replace(/\+/g, " "));
+      var c = byKey[k];
+      if (!c || !Object.prototype.hasOwnProperty.call(state, k)) return;
+
+      if (c.type === "range") {
+        var n = Number(v);
+        if (!isFinite(n)) return;
+        state[k] = Math.min(c.max, Math.max(c.min, n));
+        return;
+      }
+      /* أزرار: القيمة المطابقة لأحد الخيارات المعلنة فقط. */
+      for (var j = 0; j < c.opts.length; j++) {
+        var ov = c.opts[j].v;
+        if (String(ov) === v) { state[k] = ov; return; }
+      }
+    });
+  }
+
   /* ══════════════════════════════════════════════════════════
      mount — كل صفحة مجال تستدعيه مرة واحدة.
      cfg = { key, state, controls[], answers:bool, render(state)->{title,sub,sheet,answers} }
@@ -99,6 +132,7 @@
     state.seed = Math.floor(Math.random() * 1e6) + 1;
     if (cfg.answers !== false && state.withAnswers === undefined) state.withAnswers = true;
     load(cfg.key, state);
+    fromURL(state, cfg.controls);
 
     var host = $("controls");
     if (!host) { log("error", "لا يوجد #controls في الصفحة"); return; }
@@ -243,5 +277,5 @@
   }
 
   return { rng: rng, randInt: randInt, shuffle: shuffle, mount: mount,
-           esc: esc, T: T, EN: EN, log: log, sheetHead: sheetHead, credit: credit, ink: ink, version: "2.3" };
+           esc: esc, T: T, EN: EN, log: log, fromURL: fromURL, sheetHead: sheetHead, credit: credit, ink: ink, version: "2.4" };
 });
