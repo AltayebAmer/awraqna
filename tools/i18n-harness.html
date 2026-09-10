@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>i18n check</title></head><body>
+<pre id="out">جارٍ الفحص…</pre>
+<script>
+/* أداة تطوير: تفحص كل صفحة في اللغتين داخل iframe (نفس الأصل ⇒ وصول كامل).
+   السبب: قواعد [data-en]{display:none} تخصيصها (0,1,0)، وأي قاعدة مكوّن
+   مثل .foo b{display:block} تتغلّب عليها فتظهر اللغتان معاً. */
+const PAGES = ["/", "/404.html", "/about/", "/art/", "/articles/", "/articles/choosing-worksheets-by-age/", "/articles/multiplication-tables-six-week-plan/", "/articles/printing-worksheets-correctly/", "/articles/teaching-arabic-letters-order/", "/articles/why-generated-worksheets-beat-pdf-banks/", "/coding/", "/contact/", "/henna/", "/language/", "/math/", "/privacy/", "/puzzles/", "/repeat/", "/science/", "/teacher/", "/terms/", "/time-money/", "/worksheets/", "/worksheets/arabic/arabic-letters-coloring/", "/worksheets/arabic/arabic-letters-tracing/", "/worksheets/arabic/arabic-numerals/", "/worksheets/arabic/english-letters-tracing/", "/worksheets/art/coloring-pages/", "/worksheets/art/connect-the-dots/", "/worksheets/art/draw-animals-step-by-step/", "/worksheets/coding/number-bases/", "/worksheets/life/money-math/", "/worksheets/life/reading-clock/", "/worksheets/math/addition-grade-1/", "/worksheets/math/comparing-numbers/", "/worksheets/math/division-grade-4/", "/worksheets/math/multiplication-table/", "/worksheets/math/number-patterns/", "/worksheets/math/subtraction-grade-2/", "/worksheets/puzzles/mazes/", "/worksheets/puzzles/sudoku/", "/worksheets/science/coordinate-grid/", "/worksheets/teacher/lined-paper/"];
+async function checkPage(url){
+  const fr = document.createElement('iframe');
+  fr.style.cssText = 'width:1100px;height:800px;position:absolute;left:-9999px';
+  document.body.appendChild(fr);
+  fr.src = url;
+  await new Promise(r => { fr.onload = r; setTimeout(r, 4000); });
+  const bad = [];
+  try {
+    const d = fr.contentDocument, w = fr.contentWindow;
+    for (const lang of ['ar','en']) {
+      d.documentElement.setAttribute('lang', lang);
+      d.documentElement.setAttribute('dir', lang === 'en' ? 'ltr' : 'rtl');
+      for (const el of d.querySelectorAll('[data-ar],[data-en]')) {
+        const mine  = el.hasAttribute('data-' + lang);
+        const shown = w.getComputedStyle(el).display !== 'none';
+        if (mine && !shown) bad.push(lang+' مخفيّ خطأً: <'+el.tagName.toLowerCase()+' class="'+el.className+'">');
+        if (!mine && shown) bad.push(lang+' ظاهر خطأً: <'+el.tagName.toLowerCase()+' class="'+el.className+'">');
+      }
+    }
+  } catch(e){ bad.push('تعذّر الوصول: '+e.message); }
+  fr.remove();
+  return bad;
+}
+(async () => {
+  const out = document.getElementById('out');
+  let fails = 0, lines = [];
+  for (const p of PAGES) {
+    const bad = await checkPage(p);
+    if (bad.length) { fails++; lines.push('✗ ' + p); bad.slice(0,4).forEach(b => lines.push('    ' + b)); }
+    out.textContent = lines.join('\n') + '\n… ' + p;
+  }
+  lines.push('');
+  lines.push(fails ? ('صفحات فيها خلل: ' + fails + ' من ' + PAGES.length)
+                   : ('نظيف: ' + PAGES.length + ' صفحة، اللغتان لا تظهران معاً في أيّها'));
+  out.textContent = lines.join('\n');
+  window.__DONE__ = true; window.__FAILS__ = fails;
+})();
+</script></body></html>
+<!-- أداة تطوير فقط، غير مرتبطة من أي صفحة. الصفحات المفحوصة مُدرجة أعلاه؛
+     أعد توليدها بعد إضافة صفحات جديدة. الاستعمال: افتح
+     http://localhost:PORT/tools/i18n-harness.html وانتظر السطر الأخير. -->

@@ -36,6 +36,7 @@ FOOTER = """<footer class="site-footer">
     <nav class="foot-nav">
       <a href="/"><span data-ar>الرئيسية</span><span data-en>Home</span></a>
       <a href="/worksheets/"><span data-ar>أوراق جاهزة</span><span data-en>Worksheets</span></a>
+      <a href="/articles/"><span data-ar>مقالات</span><span data-en>Articles</span></a>
       <a href="/about/"><span data-ar>من نحن</span><span data-en>About</span></a>
       <a href="/privacy/"><span data-ar>الخصوصية</span><span data-en>Privacy</span></a>
       <a href="/terms/"><span data-ar>شروط الاستخدام</span><span data-en>Terms</span></a>
@@ -144,8 +145,9 @@ def sitemap(slugs):
             continue
         if not seg:                          prio = "1.0"   # الرئيسية
         elif seg.strip("/") in slugs:        prio = "0.4"   # صفحات الثقة
+        elif seg in ("worksheets/", "articles/"): prio = "0.9"  # الفهارس
         elif seg.startswith("worksheets/"):  prio = "0.8"   # صفحة ورقة بعينها
-        elif seg == "worksheets/":           prio = "0.9"   # فهرس الأوراق
+        elif seg.startswith("articles/"):    prio = "0.7"   # مقال
         else:                                prio = "0.9"   # مولّدات الأوراق
         urls.append((SITE + "/" + seg, prio))
     urls.sort(key=lambda u: (-float(u[1]), u[0]))
@@ -351,6 +353,232 @@ def index_html(data):
            blocks="\n\n".join(blocks))
 
 
+
+# ── المقالات ───────────────────────────────────────────────────────
+AR_DIGITS = "٠١٢٣٤٥٦٧٨٩"
+
+def ar_num(n):
+    return "".join(AR_DIGITS[int(c)] for c in str(n))
+
+def ar_date(iso):
+    y, m, d = iso.split("-")
+    months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+              "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+    return "%s %s %s" % (ar_num(int(d)), months[int(m) - 1], ar_num(y))
+
+def words_of(body):
+    return len(re.sub(r"<[^>]+>", " ", " ".join(body)).split())
+
+def read_min(body):
+    """دقائق القراءة — ١٨٠ كلمة عربية في الدقيقة، بحدّ أدنى دقيقة."""
+    return max(1, round(words_of(body) / 180.0))
+
+def read_ar(body):
+    """صياغة عربية سليمة للمدة: المفرد والمثنى وجمع القلة والكثرة."""
+    n = read_min(body)
+    if n == 1: return "قراءة دقيقة"
+    if n == 2: return "قراءة دقيقتين"
+    if n <= 10: return "قراءة %s دقائق" % ar_num(n)
+    return "قراءة %s دقيقة" % ar_num(n)
+
+
+def article_html(a, all_articles):
+    url = SITE + "/articles/" + a["slug"] + "/"
+    words = words_of(a["body"])
+    mins = read_min(a["body"])
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": a["h1"],
+        "description": a["desc"],
+        "url": url,
+        "mainEntityOfPage": url,
+        "datePublished": a["date"],
+        "dateModified": a.get("updated", a["date"]),
+        "inLanguage": "ar",
+        "wordCount": words,
+        "keywords": ", ".join(a["tags"]),
+        "image": SITE + "/og.png",
+        "isAccessibleForFree": True,
+        "author": {"@type": "Person", "name": "Artist Altayeb Amer",
+                   "alternateName": "الفنان الطيب عامر", "url": SITE + "/about/"},
+        "publisher": {"@type": "Organization", "name": "أوراقنا", "url": SITE + "/",
+                      "logo": {"@type": "ImageObject", "url": SITE + "/apple-touch-icon.png"}},
+    }
+    crumbs = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "أوراقنا", "item": SITE + "/"},
+            {"@type": "ListItem", "position": 2, "name": "المقالات", "item": SITE + "/articles/"},
+            {"@type": "ListItem", "position": 3, "name": a["h1"], "item": url},
+        ],
+    }
+    others = [x for x in all_articles if x["slug"] != a["slug"]][:3]
+    more = "\n".join(
+        '      <a class="rel-card" href="/articles/%s/"><span class="rel-t">%s</span>'
+        '<span class="rel-s">%s · %s</span></a>'
+        % (o["slug"], esc(o["h1"]), esc(o["tags"][0]), read_ar(o["body"]))
+        for o in others)
+    tags = "".join('<span class="ws-tag">%s</span>' % esc(t) for t in a["tags"])
+
+    return """<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-creator="Artist Altayeb Amer" data-creator-ar="الفنان الطيب عامر" data-source="https://awraqna.com">
+<head>
+<meta charset="utf-8">
+{guardian}
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title>
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{url}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{site}/og.png">
+<meta property="og:locale" content="ar_AR">
+<meta property="article:published_time" content="{date}">
+<meta property="article:author" content="الفنان الطيب عامر">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{site}/og.png">
+<script type="application/ld+json">{schema}</script>
+<script type="application/ld+json">{crumbs}</script>
+<link rel="stylesheet" href="/assets/brand.css">
+<link rel="stylesheet" href="/assets/page.css">
+</head>
+<body>
+
+{header}
+
+<main class="wrap">
+  <nav class="crumbs" aria-label="مسار التصفّح">
+    <a href="/">أوراقنا</a><span>›</span><a href="/articles/">المقالات</a>
+  </nav>
+
+  <article class="art">
+    <header class="art-head">
+      <h1>{h1}</h1>
+      <p class="art-lead">{desc}</p>
+      <p class="art-meta">
+        <time datetime="{date}">{date_ar}</time><span class="sep">·</span>
+        <span>{mins}</span><span class="sep">·</span>
+        <span>الفنان الطيب عامر</span>
+      </p>
+      <p class="ws-meta">{tags}</p>
+    </header>
+
+    <div class="prose art-body">
+{body}
+    </div>
+  </article>
+
+  <div data-ad-slot="rectangle"></div>
+
+  <section class="rel">
+    <h2>اقرأ أيضاً</h2>
+    <div class="rel-grid">
+{more}
+    </div>
+  </section>
+</main>
+
+{footer}
+
+<script src="/assets/lang.js"></script>
+<script src="/assets/ads.js" defer></script>
+</body>
+</html>
+""".format(
+        guardian=GUARDIAN, title=esc(a["title"]), desc=esc(a["desc"]), url=url,
+        site=SITE, h1=esc(a["h1"]), header=HEADER, footer=FOOTER,
+        date=a["date"], date_ar=ar_date(a["date"]), mins=read_ar(a["body"]), tags=tags,
+        schema=json.dumps(schema, ensure_ascii=False, separators=(",", ":")),
+        crumbs=json.dumps(crumbs, ensure_ascii=False, separators=(",", ":")),
+        more=more,
+        body="\n".join("      " + line for line in a["body"]))
+
+
+def articles_index_html(arts):
+    url = SITE + "/articles/"
+    rows = "\n".join(
+        '    <a class="art-card" href="/articles/%s/">\n'
+        '      <span class="art-card-tags">%s</span>\n'
+        '      <span class="art-card-t">%s</span>\n'
+        '      <span class="art-card-d">%s</span>\n'
+        '      <span class="art-card-m"><time datetime="%s">%s</time> · %s</span>\n'
+        '    </a>'
+        % (a["slug"], " · ".join(esc(t) for t in a["tags"]), esc(a["h1"]), esc(a["desc"]),
+           a["date"], ar_date(a["date"]), read_ar(a["body"]))
+        for a in arts)
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "مقالات أوراقنا",
+        "description": "مقالات عملية للمعلّمين والأهل عن تعليم الحروف والحساب واختيار أوراق العمل.",
+        "url": url,
+        "inLanguage": "ar",
+        "blogPost": [{"@type": "BlogPosting", "headline": a["h1"], "datePublished": a["date"],
+                      "url": SITE + "/articles/" + a["slug"] + "/"} for a in arts],
+    }
+    desc = ("مقالات عملية للمعلّمين والأهل: ترتيب تعليم الحروف العربية، خطة جدول الضرب، "
+            "اختيار الورقة المناسبة للعمر، والطباعة الصحيحة.")
+    return """<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-creator="Artist Altayeb Amer" data-creator-ar="الفنان الطيب عامر" data-source="https://awraqna.com">
+<head>
+<meta charset="utf-8">
+{guardian}
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مقالات تعليمية للمعلّمين والأهل | أوراقنا</title>
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{url}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="مقالات تعليمية للمعلّمين والأهل | أوراقنا">
+<meta property="og:description" content="{desc}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{site}/og.png">
+<meta property="og:locale" content="ar_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{site}/og.png">
+<script type="application/ld+json">{schema}</script>
+<link rel="stylesheet" href="/assets/brand.css">
+<link rel="stylesheet" href="/assets/page.css">
+</head>
+<body>
+
+{header}
+
+<main class="wrap">
+  <div class="hero">
+    <h1>مقالات</h1>
+    <p>ما تعلّمناه من بناء أدوات التعليم — مكتوب للمعلّم والأمّ، لا للمبرمج.</p>
+  </div>
+
+  <div class="art-list">
+{rows}
+  </div>
+
+  <div data-ad-slot="rectangle"></div>
+</main>
+
+{footer}
+
+<script src="/assets/lang.js"></script>
+<script src="/assets/ads.js" defer></script>
+</body>
+</html>
+""".format(guardian=GUARDIAN, desc=esc(desc), url=url, site=SITE,
+           header=HEADER, footer=FOOTER, rows=rows,
+           schema=json.dumps(schema, ensure_ascii=False, separators=(",", ":")))
+
+
 FOOT_RE = re.compile(r'<footer class="site-footer">.*?</footer>', re.S)
 
 def main():
@@ -372,7 +600,7 @@ def main():
             if not fn.endswith(".html"):
                 continue
             rel = os.path.relpath(os.path.join(dirpath, fn), ROOT)
-            if rel.split(os.sep)[0] in slugs or rel.startswith("worksheets" + os.sep):
+            if rel.split(os.sep)[0] in slugs or rel.split(os.sep)[0] in ("worksheets", "articles"):
                 continue                      # مولَّدة أصلاً بالتذييل الصحيح
             html = rd(rel)
             if not FOOT_RE.search(html):
@@ -390,6 +618,16 @@ def main():
             written.append(path)
     if wr("worksheets/index.html", index_html(wdata)):
         written.append("worksheets/index.html")
+
+    # ٢ج) المقالات + فهرسها
+    adata = json.load(open(os.path.join(ROOT, "content/articles.json"), encoding="utf-8"))
+    arts = sorted(adata["articles"], key=lambda a: a["date"], reverse=True)
+    for a in arts:
+        path = "articles/" + a["slug"] + "/index.html"
+        if wr(path, article_html(a, arts)):
+            written.append(path)
+    if wr("articles/index.html", articles_index_html(arts)):
+        written.append("articles/index.html")
 
     # ٣) خريطة الموقع — تُبنى من الصفحات الموجودة فعلاً، لا من قائمة يدوية
     if wr("sitemap.xml", sitemap(slugs)):

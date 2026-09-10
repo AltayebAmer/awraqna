@@ -3,5 +3,6 @@ Allow: /
 
 # عمل موقوف غير مكتمل — يُنشر لكنه لا يُفهرَس.
 Disallow: /henna/
+Disallow: /tools/          # أدوات تطوير (فحص، توليد معاينات) لا محتوى
 
 Sitemap: https://awraqna.com/sitemap.xml
