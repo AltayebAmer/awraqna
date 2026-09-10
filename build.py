@@ -35,6 +35,7 @@ FOOTER = """<footer class="site-footer">
   <div class="wrap">
     <nav class="foot-nav">
       <a href="/"><span data-ar>الرئيسية</span><span data-en>Home</span></a>
+      <a href="/worksheets/"><span data-ar>أوراق جاهزة</span><span data-en>Worksheets</span></a>
       <a href="/about/"><span data-ar>من نحن</span><span data-en>About</span></a>
       <a href="/privacy/"><span data-ar>الخصوصية</span><span data-en>Privacy</span></a>
       <a href="/terms/"><span data-ar>شروط الاستخدام</span><span data-en>Terms</span></a>
@@ -141,9 +142,11 @@ def sitemap(slugs):
         seg = "" if rel == "." else rel.replace(os.sep, "/") + "/"
         if seg.strip("/") in NOINDEX:
             continue
-        if not seg:            prio = "1.0"   # الرئيسية
-        elif seg.strip("/") in slugs: prio = "0.4"   # صفحات الثقة
-        else:                  prio = "0.9"   # مولّدات الأوراق
+        if not seg:                          prio = "1.0"   # الرئيسية
+        elif seg.strip("/") in slugs:        prio = "0.4"   # صفحات الثقة
+        elif seg.startswith("worksheets/"):  prio = "0.8"   # صفحة ورقة بعينها
+        elif seg == "worksheets/":           prio = "0.9"   # فهرس الأوراق
+        else:                                prio = "0.9"   # مولّدات الأوراق
         urls.append((SITE + "/" + seg, prio))
     urls.sort(key=lambda u: (-float(u[1]), u[0]))
     body = "\n".join(
@@ -153,6 +156,200 @@ def sitemap(slugs):
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
             + body + "\n</urlset>\n")
+
+
+def ws_html(w, cats):
+    cat = cats[w["cat"]]
+    url = SITE + "/worksheets/" + w["cat"] + "/" + w["slug"] + "/"
+    tool = cat["tool"] + "?" + w["params"]
+    img = "/assets/previews/" + w["slug"] + ".png"
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": w["h1"],
+        "description": w["desc"],
+        "url": url,
+        "learningResourceType": "worksheet",
+        "educationalLevel": w["level"],
+        "educationalUse": ["assignment", "practice"],
+        "inLanguage": "ar",
+        "isAccessibleForFree": True,
+        "typicalAgeRange": w.get("age", "5-14"),
+        "image": SITE + img,
+        "license": SITE + "/terms/",
+        "author": {"@type": "Person", "name": "Artist Altayeb Amer",
+                   "alternateName": "الفنان الطيب عامر"},
+        "publisher": {"@type": "Organization", "name": "أوراقنا", "url": SITE + "/"},
+        "isPartOf": {"@type": "WebSite", "name": "أوراقنا", "url": SITE + "/"},
+    }
+    crumbs = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "أوراقنا", "item": SITE + "/"},
+            {"@type": "ListItem", "position": 2, "name": "أوراق العمل",
+             "item": SITE + "/worksheets/"},
+            {"@type": "ListItem", "position": 3, "name": cat["ar"],
+             "item": SITE + "/worksheets/" + w["cat"] + "/"},
+            {"@type": "ListItem", "position": 4, "name": w["h1"], "item": url},
+        ],
+    }
+    return """<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-creator="Artist Altayeb Amer" data-creator-ar="الفنان الطيب عامر" data-source="https://awraqna.com">
+<head>
+<meta charset="utf-8">
+{guardian}
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title>
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{url}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{site}{img}">
+<meta property="og:locale" content="ar_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{site}{img}">
+<script type="application/ld+json">{schema}</script>
+<script type="application/ld+json">{crumbs}</script>
+<link rel="stylesheet" href="/assets/brand.css">
+<link rel="stylesheet" href="/assets/page.css">
+</head>
+<body>
+
+{header}
+
+<main class="wrap">
+  <nav class="crumbs" aria-label="مسار التصفّح">
+    <a href="/">أوراقنا</a><span>›</span><a href="/worksheets/">أوراق العمل</a><span>›</span><span>{cat_ar}</span>
+  </nav>
+
+  <div class="ws-top">
+    <div class="ws-intro">
+      <h1>{h1}</h1>
+      <p class="ws-lead">{desc}</p>
+      <p class="ws-meta"><span class="ws-tag">{level}</span><span class="ws-tag">A4 · صفحة واحدة</span><span class="ws-tag">مجاناً بلا تسجيل</span></p>
+      <a class="btn btn-primary ws-cta" href="{tool}">ولّد ورقة جديدة واطبعها</a>
+      <p class="ws-hint">تفتح الأداة على هذا الإعداد مباشرةً — عدّله كما تشاء.</p>
+    </div>
+    <figure class="ws-figure">
+      <a href="{tool}"><img src="{img}" width="620" alt="معاينة: {alt}" loading="lazy" decoding="async"></a>
+      <figcaption>معاينة الورقة كما تُطبع — الأسئلة تختلف في كل توليد.</figcaption>
+    </figure>
+  </div>
+
+  <article class="prose">
+{body}
+  </article>
+
+  <div data-ad-slot="rectangle"></div>
+</main>
+
+{footer}
+
+<script src="/assets/lang.js"></script>
+<script src="/assets/ads.js" defer></script>
+</body>
+</html>
+""".format(
+        guardian=GUARDIAN, title=esc(w["title"]), desc=esc(w["desc"]), url=url,
+        site=SITE, img=img, h1=esc(w["h1"]), header=HEADER, footer=FOOTER,
+        tool=tool, cat_ar=esc(cat["ar"]), level=esc(w["level"]),
+        alt=esc(w["h1"]),
+        schema=json.dumps(schema, ensure_ascii=False, separators=(",", ":")),
+        crumbs=json.dumps(crumbs, ensure_ascii=False, separators=(",", ":")),
+        body="\n".join("    " + line for line in w["body"]))
+
+
+def index_html(data):
+    """فهرس /worksheets/ — مدخل التصفّح ونقطة الزحف لكل الصفحات."""
+    cats, ws = data["categories"], data["worksheets"]
+    url = SITE + "/worksheets/"
+    blocks = []
+    for ck, c in cats.items():
+        items = [w for w in ws if w["cat"] == ck]
+        if not items:
+            continue
+        cards = "\n".join(
+            '      <a class="ws-card" href="/worksheets/%s/%s/">'
+            '<img src="/assets/previews/%s.png" width="620" alt="%s" loading="lazy" decoding="async">'
+            '<span class="ws-card-t">%s</span><span class="ws-card-s">%s</span></a>'
+            % (w["cat"], w["slug"], w["slug"], esc(w["h1"]), esc(w["h1"]), esc(w["level"]))
+            for w in items)
+        blocks.append(
+            '    <section class="ws-sec" id="%s">\n'
+            '      <h2><span class="ws-ico">%s</span>%s</h2>\n'
+            '      <div class="ws-grid">\n%s\n      </div>\n    </section>'
+            % (ck, c["icon"], esc(c["ar"]), cards))
+
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "أوراق عمل جاهزة للطباعة",
+        "description": "فهرس أوراق العمل التعليمية المجانية في أوراقنا — رياضيات وحروف وألغاز ورسم وعلوم.",
+        "url": url,
+        "inLanguage": "ar",
+        "hasPart": [{"@type": "LearningResource", "name": w["h1"],
+                     "url": SITE + "/worksheets/" + w["cat"] + "/" + w["slug"] + "/"} for w in ws],
+    }
+    desc = ("فهرس أوراق العمل المجانية في أوراقنا: %d ورقة جاهزة للطباعة في الرياضيات "
+            "والحروف العربية والإنجليزية والألغاز والرسم والعلوم — بأسئلة تتجدّد في كل توليد." % len(ws))
+    return """<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-creator="Artist Altayeb Amer" data-creator-ar="الفنان الطيب عامر" data-source="https://awraqna.com">
+<head>
+<meta charset="utf-8">
+{guardian}
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>أوراق عمل جاهزة للطباعة مجاناً — {n} ورقة | أوراقنا</title>
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{url}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="أوراق عمل جاهزة للطباعة مجاناً — {n} ورقة | أوراقنا">
+<meta property="og:description" content="{desc}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{site}/og.png">
+<meta property="og:locale" content="ar_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{site}/og.png">
+<script type="application/ld+json">{schema}</script>
+<link rel="stylesheet" href="/assets/brand.css">
+<link rel="stylesheet" href="/assets/page.css">
+</head>
+<body>
+
+{header}
+
+<main class="wrap">
+  <div class="hero">
+    <h1>أوراق عمل جاهزة للطباعة</h1>
+    <p>{n} ورقة مجانية — اضغط أيّها شئت لتفتح على إعدادها، ثم ولّد واطبع. الأسئلة تتجدّد في كل مرة.</p>
+  </div>
+
+{blocks}
+
+  <div data-ad-slot="rectangle"></div>
+</main>
+
+{footer}
+
+<script src="/assets/lang.js"></script>
+<script src="/assets/ads.js" defer></script>
+</body>
+</html>
+""".format(guardian=GUARDIAN, desc=esc(desc), url=url, site=SITE, n=len(ws),
+           header=HEADER, footer=FOOTER,
+           schema=json.dumps(schema, ensure_ascii=False, separators=(",", ":")),
+           blocks="\n\n".join(blocks))
+
 
 FOOT_RE = re.compile(r'<footer class="site-footer">.*?</footer>', re.S)
 
@@ -175,7 +372,7 @@ def main():
             if not fn.endswith(".html"):
                 continue
             rel = os.path.relpath(os.path.join(dirpath, fn), ROOT)
-            if rel.split(os.sep)[0] in slugs:
+            if rel.split(os.sep)[0] in slugs or rel.startswith("worksheets" + os.sep):
                 continue                      # مولَّدة أصلاً بالتذييل الصحيح
             html = rd(rel)
             if not FOOT_RE.search(html):
@@ -184,6 +381,15 @@ def main():
             new = FOOT_RE.sub(lambda m: FOOTER, html, count=1)
             if wr(rel, new):
                 written.append(rel)
+
+    # ٢ب) صفحات الأوراق + فهرسها
+    wdata = json.load(open(os.path.join(ROOT, "content/worksheets.json"), encoding="utf-8"))
+    for w in wdata["worksheets"]:
+        path = "worksheets/" + w["cat"] + "/" + w["slug"] + "/index.html"
+        if wr(path, ws_html(w, wdata["categories"])):
+            written.append(path)
+    if wr("worksheets/index.html", index_html(wdata)):
+        written.append("worksheets/index.html")
 
     # ٣) خريطة الموقع — تُبنى من الصفحات الموجودة فعلاً، لا من قائمة يدوية
     if wr("sitemap.xml", sitemap(slugs)):
