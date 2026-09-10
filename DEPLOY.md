@@ -1,63 +1,184 @@
 # نشر أوراقنا — awraqna.com
 
-موقع ثابت بالكامل. لا خادم، لا قاعدة بيانات، لا build step، لا تبعيات.
+موقع ثابت بالكامل: لا خادم، لا قاعدة بيانات، لا `npm`، لا build step عند
+الاستضافة. الطريقة المعتمدة: **GitHub → Cloudflare Pages**، فكل `git push`
+ينشر تلقائياً.
 
-## ما يُرفع
+> **مهم:** `build.py` يعمل **عندك قبل الرفع**، لا على Cloudflare. لذلك
+> يجب أن تكون الصفحات المولَّدة **مُثبّتة في المستودع** (committed).
+> فحص ما قبل النشر يمنعك من نسيان ذلك.
 
-كل محتويات المجلد **ما عدا**:
+---
 
-| لا تُرفع | السبب |
-|---|---|
-| `DEPLOY.md` | تعليمات داخلية |
-| `PROJECT_MAP.md` · `CLAUDE.md` · `ROADMAP.md` | ذاكرة تطوير |
-| `guardian.config.json` | مدخل الحاقن وقت البناء — لا يقرأه المتصفح |
-| `.git/` · `.gitignore` | تُستبعد تلقائياً |
-| `../.claude/launch.json` | خارج المجلد أصلاً |
-
-الملفات المنشورة: `index.html` (الرئيسية) · `math/` · `puzzles/` · `teacher/`
-· `art/` · `language/` · `coding/` · `science/` · `time-money/`
-· `404.html` · `robots.txt` · `sitemap.xml` · `favicon.ico` · `favicon.svg`
-· `apple-touch-icon.png` · `_headers` · `assets/` (بما فيه `assets/fonts/`)
-· **`humans.txt` · `LICENSE.md` · `.well-known/guardian.json`** (طبقة الملكية)
-
-> **الحارس:** `assets/guardian-config.js` يجب أن يُرفع مع `assets/guardian.js`
-> ويُحمَّل قبله. بدونه يسقط الحارس إلى الافتراضيات ويصبح اسم المشروع
-> هو اسم المضيف. **و`.well-known/` مجلد مخفي** — تأكّد أن أداة الرفع لا تتخطّاه.
-
-> **الخطوط:** `assets/fonts/` يحوي ثلاثة خطوط بترخيص SIL OFL مجزّأة على
-> المحارف العربية (146KB إجمالاً). **لا تحذف `assets/fonts/OFL.txt`** — بقاء
-> نص الرخصة مع الملفات شرطٌ في الترخيص.
-
-## Cloudflare Pages (النطاق مُدار عندهم أصلاً ⇒ الأبسط)
-
-1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Upload assets**
-2. اسحب **محتويات** مجلد `awraqna/` — لا المجلد نفسه.
-3. اسم المشروع: `awraqna` → **Deploy**
-4. **Custom domains** → أضف `awraqna.com` ثم `www.awraqna.com`
-5. النطاق مُشترى من Cloudflare Registrar ⇒ سجلّات DNS تُضبط تلقائياً.
-
-`_headers` مدعوم في Cloudflare Pages و Netlify. **GitHub Pages لا يدعمه** ⇒ ستفقد
-ضبط التخزين المؤقت وترويسات الأمان.
-
-## بعد النشر — تحقّق فعلياً لا افتراضاً
+## قبل أي رفع — أمر واحد
 
 ```bash
-curl -sI https://awraqna.com | head -1
-curl -s https://awraqna.com/robots.txt
-curl -sI https://awraqna.com/assets/gen/math.js | grep -i cache-control
-curl -sI https://awraqna.com/assets/fonts/amiri.woff2 | grep -iE "content-type|cache-control" 
-curl -sI https://awraqna.com/nope | head -1
-curl -sI https://awraqna.com | grep -i "x-creator\|x-guardian"
-curl -s https://awraqna.com/.well-known/guardian.json | head -3
-for p in "" math/ puzzles/ teacher/; do curl -s -o /dev/null -w "$p %{http_code}\n" https://awraqna.com/$p; done
+cd "/Users/altamer/Claude Workspace/awraqna" && python3 tools/preflight.py
 ```
-المتوقع: `200` · محتوى robots · `max-age=86400, must-revalidate` · `404` · و`200` للمجالات الأربعة.
 
-ثم افتح الموقع واطبع ورقة فعلياً (Ctrl/Cmd+P) وتأكد من **صفحتين لا ثلاث**.
+يفحص عشرة أشياء ويعطي رمز خروج: **0 = ارفع · 1 = لا ترفع**.
 
-## خطوتان بعد الإطلاق — ليستا من عمل النشر
+| # | الفحص | يمنع |
+|---|---|---|
+| ١ | البناء محدَّث | نشر صفحات أقدم من `content/*.json` |
+| ٢ | الروابط الداخلية | رابط مكسور بعد إعادة تسمية |
+| ٣ | canonical · description · og:image · title · lang | صفحة تفقد وسماً بعد إضافة قالب |
+| ٤ | canonical يطابق مساره | نسختان من الصفحة في الفهرس |
+| ٥ | sitemap مطابق للصفحات | خريطة تشير إلى صفحة محذوفة |
+| ٦ | الحنة معزولة | تسرّب عمل غير مكتمل إلى جوجل |
+| ٧ | `X-Robots-Tag` على المصدر | فهرسة `.md` و`.py` ومنافستها للصفحات |
+| ٨ | الأصول وصور المعاينة | صفحة ورقة بصورة مكسورة |
+| ٩ | لا أسرار ولا `TODO` | تسريب مفتاح · placeholder منشور |
+| ١٠ | git نظيف ومرفوع | نشر لا يطابق ما تراه محلياً |
 
-1. **Google Search Console**: أضف `awraqna.com`، وأرسل `sitemap.xml`.
-   بدون هذا قد تمرّ أسابيع قبل الفهرسة.
-2. **AdSense**: حساب واحد يغطي `awraqna.com` و `007.gallery`.
-   حتى الموافقة، `assets/ads.js` يعرض إعلانات بيتية متبادلة — لا فراغ.
+إن رجع **1**، أصلح ما يشير إليه ثم أعد التشغيل. لا تتجاوزه.
+
+---
+
+## الرفع (كل مرة بعد الأولى)
+
+```bash
+cd "/Users/altamer/Claude Workspace/awraqna" && python3 tools/preflight.py && git push
+```
+
+Cloudflare يلتقط الدفعة ويبني خلال دقيقة تقريباً. لا خطوة أخرى.
+
+**حالياً هناك ٦ commits غير مرفوعة** — شغّل الأمر أعلاه.
+
+---
+
+## الإعداد لأول مرة (مرة واحدة فقط)
+
+المستودع موجود: <https://github.com/AltayebAmer/awraqna>
+
+### ١) أنشئ مشروع Cloudflare Pages
+
+Cloudflare Dashboard ← **Workers & Pages** ← **Create** ← **Pages** ←
+**Connect to Git** ← اختر مستودع `awraqna`.
+
+| الحقل | القيمة |
+|---|---|
+| Project name | `awraqna-site` |
+| Production branch | `main` |
+| Framework preset | **None** |
+| Build command | **اتركه فارغاً** |
+| Build output directory | `/` |
+
+> اسم `awraqna` محجوز بمشروع الرفع اليدوي القديم، لذلك `awraqna-site`.
+> لا تحاول إعادة استعماله قبل حذف القديم.
+
+اضغط **Save and Deploy** وانتظر أول بناء.
+
+### ٢) اختبر على رابط Pages المؤقّت
+
+سيعطيك رابطاً مثل `awraqna-site.pages.dev`. افتحه وتحقّق:
+
+- الرئيسية تفتح، وشريطا «٢٠ ورقة جاهزة» و«مقالات» يعملان.
+- `/worksheets/` تعرض ٢٠ بطاقة **بصورها** (لا مربّعات فارغة).
+- افتح ورقة واضغط «ولّد ورقة جديدة واطبعها» → تفتح الأداة على الإعداد الصحيح.
+- `Ctrl/Cmd + P` على أي مولّد → **صفحة أو صفحتان**، بلا أزرار ولا إعلانات.
+- `/about/` و`/privacy/` و`/terms/` و`/contact/` تفتح من التذييل.
+- زر `EN` يقلب اللغة، ولا تظهر اللغتان معاً.
+
+### ٣) انقل النطاق
+
+في مشروع `awraqna-site` ← **Custom domains** ← **Set up a domain** ←
+أضف `awraqna.com` ثم `www.awraqna.com`.
+
+> إن رفض النطاق لأنه مربوط بالمشروع القديم: احذفه من **المشروع القديم**
+> أولاً (Custom domains ← Remove)، ثم أضفه هنا. سجلّات DNS يديرها
+> Cloudflare تلقائياً لأن النطاق مسجَّل عنده.
+
+### ٤) احذف المشروع القديم
+
+بعد أن يعمل `awraqna.com` من المشروع الجديد **وتتأكّد بنفسك**:
+المشروع القديم ← Settings ← **Delete project**.
+
+لا تحذفه قبل التأكّد — الحذف لا رجعة فيه.
+
+---
+
+## بعد النشر مباشرةً
+
+### Search Console
+1. <https://search.google.com/search-console> ← Add property ← Domain ← `awraqna.com`.
+   التحقّق يتم بسجلّ TXT — Cloudflare يضيفه بضغطة إن كان النطاق عنده.
+2. Sitemaps ← أضف `sitemap.xml`.
+3. URL Inspection ← اطلب فهرسة يدوية لأهمّ عشرة روابط:
+   `/` · `/worksheets/` · `/articles/` · وأهمّ سبع صفحات أوراق ومقالات.
+
+### Bing Webmaster Tools
+<https://www.bing.com/webmasters> — يستورد من Search Console بضغطة.
+
+### Cloudflare Web Analytics — **معلّق بانتظارك**
+Analytics & Logs ← Web Analytics ← Add a site ← `awraqna.com` → ستحصل على `token`.
+
+**أعطني الـ token** فأضيفه في `build.py` ليُحقن في الصفحات الثلاث والأربعين
+دفعةً واحدة. لم أضع placeholder عمداً — سطر بـ `PUT_YOUR_TOKEN_HERE` منشور
+هو عطل صامت، لا إعداد.
+
+> استعمل **Manual Setup** لا Automatic: الحقن التلقائي لا يعمل مع النطاق
+> إن كان DNS-only (سحابة رمادية).
+
+---
+
+## ماذا يُنشر بالضبط
+
+Cloudflare Pages ينشر **كل ما في المستودع** — لا يوجد ملف استثناء.
+لذلك `build.py` و`content/*.json` و`tools/` و`*.md` تُخدَم فعلاً.
+
+هذا مقبول (لا سرّ في المشروع)، والحماية من الفهرسة في `_headers`:
+
+```
+/*.md      X-Robots-Tag: noindex, nofollow
+/*.py      X-Robots-Tag: noindex, nofollow
+/tools/*   X-Robots-Tag: noindex, nofollow
+/content/* X-Robots-Tag: noindex, nofollow
+/henna/*   X-Robots-Tag: noindex, nofollow
+```
+
+`robots.txt` **يطلب** من الزاحف الامتناع، و`X-Robots-Tag` **تُلزمه**.
+الاثنان معاً؛ لا تحذف أيّهما.
+
+### تنبيهات لا تتجاوزها
+- **`.well-known/` مجلد مخفي.** يصل عبر `git push` دائماً، لكنه يختفي في
+  السحب اليدوي من Finder على macOS. لا ترفع يدوياً.
+- **`assets/fonts/OFL.txt`** يجب أن يبقى مع الخطوط — شرط في رخصة SIL OFL.
+- **`assets/guardian-config.js`** يُحمَّل قبل `guardian.js`؛ بدونه يسقط
+  الحارس إلى الافتراضيات ويصير اسم المشروع هو اسم المضيف.
+
+---
+
+## بعد أي تعديل على المحتوى
+
+```bash
+cd "/Users/altamer/Claude Workspace/awraqna"
+python3 build.py                    # يبني الصفحات + sitemap
+python3 tools/preflight.py          # يجب أن يعطي: جاهز للنشر
+git add -A && git commit -m "وصف التعديل"
+git push
+```
+
+- **صفحة ورقة أو مقال جديد:** أضف عنصراً في `content/worksheets.json` أو
+  `content/articles.json` ثم `build.py`.
+- **صورة معاينة لورقة جديدة:** `python3 tools/make-previews.py` (يبني الناقص فقط).
+- **تغيّر مولّد فتغيّرت أوراقه:** `python3 tools/make-previews.py --all`.
+- **لا تحرّر التذييل أو صفحات `worksheets/` و`articles/` و`about/` في HTML
+  مباشرةً** — `build.py` يدهسها. مكان التحرير `content/*.json` و`build.py`.
+
+## فحص مبدّل اللغة
+
+فاحص يعمل في المتصفح لا في الطرفية. شغّل خادماً محلياً:
+
+```bash
+cd "/Users/altamer/Claude Workspace/awraqna" && python3 -m http.server 8899
+```
+
+ثم افتح <http://localhost:8899/tools/i18n-harness.html> وانتظر السطر الأخير.
+يفتح كل صفحة في `iframe`، يقلب اللغة، ويتأكّد أن العربية والإنجليزية لا
+تظهران معاً. شغّله بعد أي تعديل على `page.css` أو `brand.css`.
+
+> **القاعدة التي يحرسها:** لا تضع `display` في قاعدة CSS تطال عنصراً يحمل
+> `data-ar` أو `data-en`. أعطِ العنصر `class="blk"` بدلاً من ذلك. قاعدة
+> `.foo b{display:block}` تخصيصها أعلى من `[data-en]{display:none}`
+> فتُظهر اللغتين معاً — وقع هذا مرتين.

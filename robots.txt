@@ -4,5 +4,7 @@ Allow: /
 # عمل موقوف غير مكتمل — يُنشر لكنه لا يُفهرَس.
 Disallow: /henna/
 Disallow: /tools/          # أدوات تطوير (فحص، توليد معاينات) لا محتوى
+Disallow: /content/        # مصدر المحتوى JSON — الصفحات المبنية هي المقصودة
+Disallow: /build.py
 
 Sitemap: https://awraqna.com/sitemap.xml

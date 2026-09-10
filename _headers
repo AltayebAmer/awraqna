@@ -34,3 +34,30 @@
 
 # صفحات الأدوات ترث `must-revalidate` من /* أعلاه ⇒ أي مجال جديد
 # يُضاف لاحقاً يحصل على السلوك الصحيح تلقائياً بلا تعديل هنا.
+
+# ── صور معاينة الأوراق ────────────────────────────────────────
+# تُعاد بالتوليد فقط حين يتغيّر المولّد ⇒ أسبوع مع إعادة تحقق.
+/assets/previews/*
+  Cache-Control: public, max-age=604800, must-revalidate
+
+# ── ملفات المصدر والتطوير ─────────────────────────────────────
+# Cloudflare Pages ينشر كل ما في المستودع، ولا يوجد ملف استثناء.
+# `robots.txt` يطلب من الزاحف الامتناع، لكنه **طلب** لا إلزام؛
+# `X-Robots-Tag` ترويسة يلتزم بها جوجل فعلياً ⇒ هي الضمانة الحقيقية.
+# لا تحذف هذه الكتل: بدونها تُفهرَس المستندات وتنافس صفحات الموقع.
+/*.md
+  X-Robots-Tag: noindex, nofollow
+/*.py
+  X-Robots-Tag: noindex, nofollow
+/tools/*
+  X-Robots-Tag: noindex, nofollow
+/content/*
+  X-Robots-Tag: noindex, nofollow
+/guardian.config.json
+  X-Robots-Tag: noindex, nofollow
+
+# ── الحنة: عمل موقوف ─────────────────────────────────────────
+# `<meta name=robots>` موجود في الصفحة، والترويسة تغطّي ما لو أُضيف
+# إليها ملف غير HTML لاحقاً.
+/henna/*
+  X-Robots-Tag: noindex, nofollow
