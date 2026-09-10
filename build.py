@@ -647,6 +647,9 @@ def main():
             if rel.split(os.sep)[0] in slugs or rel.split(os.sep)[0] in ("worksheets", "articles"):
                 continue                      # مولَّدة أصلاً بالتذييل الصحيح
             html = rd(rel)
+            # ملفات تحقّق محركات البحث ليست صفحات موقع: لا تذييل ولا وسوم.
+            if re.match(r"^google[0-9a-f]+\.html$", fn) or fn.startswith("BingSiteAuth"):
+                continue
             if not FOOT_RE.search(html):
                 print("  ! لا تذييل في " + rel, file=sys.stderr)
                 continue

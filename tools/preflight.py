@@ -26,8 +26,10 @@ def pages():
 
 def indexable():
     """الصفحات المقصود فهرستها: كل صفحة عدا 404 والحنة وأدوات التطوير."""
+    import re as _re
     return [p for p in pages()
-            if p != "404.html" and not p.startswith(("henna/", "tools/"))]
+            if p != "404.html" and not p.startswith(("henna/", "tools/"))
+            and not _re.match(r"^google[0-9a-f]+\.html$", p)]
 
 
 print("\n١) البناء محدَّث؟")
