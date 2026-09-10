@@ -42,6 +42,13 @@
 <meta property="og:title" content="أوراقنا — أوراق عمل ومواد تعليمية للطباعة">
 <meta property="og:description" content="مولّدات أوراق عمل مجانية تعمل كلياً في متصفحك.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://awraqna.com/">
+<meta property="og:image" content="https://awraqna.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ar_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://awraqna.com/og.png">
 <link rel="stylesheet" href="assets/brand.css">
 <link rel="stylesheet" href="assets/page.css">
 <style>
@@ -181,28 +188,25 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <span data-ar>أوراقنا · يعمل كلياً في متصفحك — لا يُرفع شيء إلى أي خادم.</span>
-    <span data-en>Awraqna · Runs entirely in your browser — nothing is uploaded.</span>
+    <nav class="foot-nav">
+      <a href="/"><span data-ar>الرئيسية</span><span data-en>Home</span></a>
+      <a href="/about/"><span data-ar>من نحن</span><span data-en>About</span></a>
+      <a href="/privacy/"><span data-ar>الخصوصية</span><span data-en>Privacy</span></a>
+      <a href="/terms/"><span data-ar>شروط الاستخدام</span><span data-en>Terms</span></a>
+      <a href="/contact/"><span data-ar>تواصل معنا</span><span data-en>Contact</span></a>
+    </nav>
+    <p class="foot-note">
+      <span data-ar>أوراقنا · يعمل كلياً في متصفحك — لا يُرفع شيء إلى أي خادم.</span>
+      <span data-en>Awraqna · Runs entirely in your browser — nothing is uploaded.</span>
+    </p>
+    <p class="foot-copy">
+      <span data-ar>© ٢٠٢٦ الفنان الطيب عامر</span>
+      <span data-en>© 2026 Artist Altayeb Amer</span>
+    </p>
   </div>
 </footer>
 
-<script>
-/* الرئيسية لا تحتاج النواة — مبدّل لغة فقط. */
-(function () {
-  var b = document.getElementById("langBtn");
-  function set(l) {
-    var h = document.documentElement;
-    h.setAttribute("lang", l);
-    h.setAttribute("dir", l === "en" ? "ltr" : "rtl");
-    b.textContent = l === "en" ? "ع" : "EN";
-    try { localStorage.setItem("awraqna_lang", l); } catch (e) {}
-  }
-  b.addEventListener("click", function () { set(h() === "en" ? "ar" : "en"); });
-  function h() { return document.documentElement.getAttribute("lang"); }
-  var s = null; try { s = localStorage.getItem("awraqna_lang"); } catch (e) {}
-  if (s === "en") set("en");
-})();
-</script>
+<script src="/assets/lang.js"></script>
 <script src="assets/ads.js" defer></script>
 </body>
 </html>
