@@ -579,10 +579,54 @@ def articles_index_html(arts):
            schema=json.dumps(schema, ensure_ascii=False, separators=(",", ":")))
 
 
+# ── قياس الزيارات ──────────────────────────────────────────────────
+# `content/site.json` اختياري: {"cfAnalyticsToken": "..."}
+# غيابه ⇒ لا بيكون إطلاقاً ولا سطر معطّل. توكن البيكون **ليس سرّاً** —
+# يظهر في مصدر كل صفحة بطبيعته، فلا مانع من وجوده في المستودع.
+# Cloudflare Web Analytics بلا كوكيز ولا تعقّب عبر المواقع ⇒ لا يحتاج
+# بانر موافقة، وهو ما تنصّ عليه صفحة الخصوصية.
+BEACON_BEGIN = "<!-- ANALYTICS:BEGIN -->"
+BEACON_END = "<!-- ANALYTICS:END -->"
+BEACON_RE = re.compile(re.escape(BEACON_BEGIN) + r".*?" + re.escape(BEACON_END), re.S)
+
+def site_cfg():
+    path = os.path.join(ROOT, "content/site.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+def beacon_html(cfg):
+    tok = (cfg.get("cfAnalyticsToken") or "").strip()
+    if not tok:
+        return ""
+    return (BEACON_BEGIN + '\n<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
+            'data-cf-beacon=\'{"token": "%s"}\'></script>\n' % tok + BEACON_END)
+
+def with_beacon(html, snippet):
+    """يستبدل كتلة موجودة أو يحقن قبل </body>؛ والغياب يُزيلها نظيفاً."""
+    if BEACON_RE.search(html):
+        return BEACON_RE.sub(lambda m: snippet, html, count=1) if snippet \
+               else BEACON_RE.sub("", html, count=1).replace("\n\n</body>", "\n</body>")
+    if not snippet:
+        return html
+    return html.replace("</body>", snippet + "\n</body>", 1)
+
 FOOT_RE = re.compile(r'<footer class="site-footer">.*?</footer>', re.S)
 
 def main():
     written = []
+    cfg = site_cfg()
+    snip = beacon_html(cfg)
+    print("قياس الزيارات: " + ("بيكون Cloudflare مُفعّل" if snip
+          else "لا بيكون (أضف content/site.json ليُحقَن)") + "\n")
+
+    global wr
+    _wr = wr
+    def wr(path, s):                      # كل صفحة تمرّ بالبيكون
+        if path.endswith(".html"):
+            s = with_beacon(s, snip)
+        return _wr(path, s)
 
     # ١) صفحات المحتوى
     data = json.load(open(os.path.join(ROOT, "content/pages.json"), encoding="utf-8"))
@@ -595,7 +639,7 @@ def main():
 
     # ٢) توحيد التذييل في كل صفحات الموقع
     for dirpath, dirnames, filenames in os.walk(ROOT):
-        dirnames[:] = [d for d in dirnames if d not in (".git", "content")]
+        dirnames[:] = [d for d in dirnames if d not in (".git", "content", "tools")]
         for fn in filenames:
             if not fn.endswith(".html"):
                 continue

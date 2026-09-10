@@ -135,15 +135,36 @@ Cloudflare Dashboard ← **Workers & Pages** ← **Create** ← **Pages** ←
 ### Bing Webmaster Tools
 <https://www.bing.com/webmasters> — يستورد من Search Console بضغطة.
 
-### Cloudflare Web Analytics — **معلّق بانتظارك**
-Analytics & Logs ← Web Analytics ← Add a site ← `awraqna.com` → ستحصل على `token`.
+### Cloudflare Web Analytics
 
-**أعطني الـ token** فأضيفه في `build.py` ليُحقن في الصفحات الثلاث والأربعين
-دفعةً واحدة. لم أضع placeholder عمداً — سطر بـ `PUT_YOUR_TOKEN_HERE` منشور
-هو عطل صامت، لا إعداد.
+**١)** Cloudflare ← Analytics & Logs ← Web Analytics ← `Add a site` ←
+`awraqna.com`. اختر **Manual Setup** لا Automatic (التلقائي لا يعمل مع
+نطاق DNS-only). ستحصل على `token` بصيغة hex.
 
-> استعمل **Manual Setup** لا Automatic: الحقن التلقائي لا يعمل مع النطاق
-> إن كان DNS-only (سحابة رمادية).
+**٢)** أنشئ الملف — هذا كل المطلوب:
+
+```bash
+cd "/Users/altamer/Claude Workspace/awraqna"
+cat > content/site.json <<'EOF'
+{ "cfAnalyticsToken": "الصق_التوكن_هنا" }
+EOF
+python3 build.py && python3 tools/preflight.py && git add -A && git commit -m "تفعيل قياس الزيارات" && git push
+```
+
+`build.py` يحقن البيكون في **الصفحات الثلاث والأربعين** دفعةً واحدة.
+حذف `content/site.json` ثم إعادة البناء يزيله من الجميع نظيفاً.
+
+> **لماذا لا يوجد ملف `site.json` جاهز بـ placeholder؟** سطر بـ
+> `PUT_YOUR_TOKEN_HERE` منشور على الإنتاج هو عطل صامت لا إعداد: يبدو
+> مفعّلاً ولا يقيس شيئاً. غياب الملف يعني غياب البيكون — حالة صريحة.
+
+> **التوكن ليس سرّاً.** يظهر في مصدر كل صفحة بطبيعته، فلا مانع من وجوده
+> في المستودع. لذلك `content/site.json` **يُرفع** ولا يدخل `.gitignore`.
+
+**٣) تحقّق، لا تفترض:** افتح الموقع في نافذة خاصة ← DevTools ← Network ←
+ابحث عن `beacon.min.js` بحالة 200. ثم ارجع إلى لوحة Web Analytics بعد
+٥–١٠ دقائق؛ يجب أن ترى زيارة واحدة. إن لم تظهر: عطّل حاجب الإعلانات
+أثناء الاختبار.
 
 ---
 
