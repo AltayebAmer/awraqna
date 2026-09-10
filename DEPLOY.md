@@ -125,46 +125,47 @@ Cloudflare Dashboard ← **Workers & Pages** ← **Create** ← **Pages** ←
 
 ## بعد النشر مباشرةً
 
-### Search Console
-1. <https://search.google.com/search-console> ← Add property ← Domain ← `awraqna.com`.
-   التحقّق يتم بسجلّ TXT — Cloudflare يضيفه بضغطة إن كان النطاق عنده.
-2. Sitemaps ← أضف `sitemap.xml`.
-3. URL Inspection ← اطلب فهرسة يدوية لأهمّ عشرة روابط:
-   `/` · `/worksheets/` · `/articles/` · وأهمّ سبع صفحات أوراق ومقالات.
+### Search Console — **الخاصية مُنشأة، ينقصها التحقّق**
+
+`awraqna.com` مضاف كـ **Domain property** لكنه غير مُتحقَّق بعد.
+
+**لماذا لم يكتمل آلياً:** زرّ `START VERIFICATION` يفتح نافذة موافقة
+Cloudflare كـ **popup منفصل**، والـ popup يخرج عن مجموعة التبويبات التي
+يتحكّم بها الوكيل ⇒ لا يمكن أتمتة هذه الخطوة بعينها. الخطوات قبلها
+وبعدها قابلة للأتمتة.
+
+1. <https://search.google.com/search-console> ← «Already started? finish
+   verification» ← `awraqna.com` ← **START VERIFICATION** ← وافق في نافذة
+   Cloudflare التي تُفتح. ثلاث ضغطات.
+2. Sitemaps ← أضف `sitemap.xml` (٤١ رابطاً).
+3. URL Inspection ← اطلب فهرسة يدوية، وابدأ بالثلاثة التي هي أبواب البقية:
+   `/` · `/worksheets/` · `/articles/`.
+
+> **بديل بلا OAuth** إن رفضت منح Google صلاحية DNS: خاصية **URL prefix**
+> يتحقّق منها بملف HTML يُرفع إلى المستودع. أقلّ تغطية (لا تشمل `www`)
+> لكنها لا تمنح أحداً صلاحية على حسابك.
 
 ### Bing Webmaster Tools
 <https://www.bing.com/webmasters> — يستورد من Search Console بضغطة.
 
-### Cloudflare Web Analytics
+### Cloudflare Web Analytics — **مفعّل، لا تلمسه**
 
-**١)** Cloudflare ← Analytics & Logs ← Web Analytics ← `Add a site` ←
-`awraqna.com`. اختر **Manual Setup** لا Automatic (التلقائي لا يعمل مع
-نطاق DNS-only). ستحصل على `token` بصيغة hex.
+`awraqna.com` مسجَّل في Web Analytics منذ ٢٠٢٦-٠٨-٢١ بوضع **Automatic
+setup**، والقياس يعمل فعلاً.
 
-**٢)** أنشئ الملف — هذا كل المطلوب:
+**فخّ وقعنا فيه تقريباً:** `curl` العادي لا يرى البيكون في المصدر، فيبدو
+كأنه غير مفعّل. السبب أن Cloudflare يحقنه **على الحافة للمتصفحات الحقيقية
+فقط**. للتحقق الصحيح مرّر ترويسة متصفح:
 
 ```bash
-cd "/Users/altamer/Claude Workspace/awraqna"
-cat > content/site.json <<'EOF'
-{ "cfAnalyticsToken": "الصق_التوكن_هنا" }
-EOF
-python3 build.py && python3 tools/preflight.py && git add -A && git commit -m "تفعيل قياس الزيارات" && git push
+curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" https://awraqna.com/ | grep -c cloudflareinsights
+# 1 = يعمل   ·   0 مع curl افتراضي لا يعني تعطّله
 ```
 
-`build.py` يحقن البيكون في **الصفحات الثلاث والأربعين** دفعةً واحدة.
-حذف `content/site.json` ثم إعادة البناء يزيله من الجميع نظيفاً.
-
-> **لماذا لا يوجد ملف `site.json` جاهز بـ placeholder؟** سطر بـ
-> `PUT_YOUR_TOKEN_HERE` منشور على الإنتاج هو عطل صامت لا إعداد: يبدو
-> مفعّلاً ولا يقيس شيئاً. غياب الملف يعني غياب البيكون — حالة صريحة.
-
-> **التوكن ليس سرّاً.** يظهر في مصدر كل صفحة بطبيعته، فلا مانع من وجوده
-> في المستودع. لذلك `content/site.json` **يُرفع** ولا يدخل `.gitignore`.
-
-**٣) تحقّق، لا تفترض:** افتح الموقع في نافذة خاصة ← DevTools ← Network ←
-ابحث عن `beacon.min.js` بحالة 200. ثم ارجع إلى لوحة Web Analytics بعد
-٥–١٠ دقائق؛ يجب أن ترى زيارة واحدة. إن لم تظهر: عطّل حاجب الإعلانات
-أثناء الاختبار.
+> **لا تنشئ `content/site.json` ما دام Automatic مفعّلاً.** آلية الحقن
+> اليدوي في `build.py` جاهزة وتعمل، لكن استعمالها الآن يضع بيكونين في
+> الصفحة ⇒ **كل زيارة تُحتسب مرتين**. لا تستعملها إلا إن انتقل الموقع
+> خارج بروكسي Cloudflare (سحابة رمادية)، فعندها يتوقّف الحقن التلقائي.
 
 ---
 

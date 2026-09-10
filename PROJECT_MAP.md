@@ -491,9 +491,25 @@ Question   : { a:int, op:'+'|'−'|'×', b:int, answer:int }
       | رابط مشوّه `?skill=NOPE&evil=1&__proto__=x` | افتراضيات + ورقة سليمة · لا تلوّث prototype |
       `sitemap.xml`: 10 → 35 رابطاً.
 
-- [ ] **بيكون Cloudflare Web Analytics** — السطر جاهز للحقن في `build.py`،
-      ينقصه `token` من حساب صاحب المشروع. **لم يُوضع placeholder عمداً.**
-      نجاح: طلب `beacon.min.js` بـ 200 في نافذة خاصة، وزيارة تظهر في اللوحة خلال ١٠ دقائق.
+- [x] **قياس الزيارات** — تبيّن أنه **مفعّل أصلاً** منذ ٢٠٢٦-٠٨-٢١ بوضع
+      Automatic setup، ويسجّل فعلاً. **فخّ كاد يوقعنا:** `curl` العادي
+      لا يرى البيكون فيبدو معطّلاً؛ Cloudflare يحقنه **على الحافة
+      للمتصفحات الحقيقية فقط** — التحقق يحتاج `-A` بترويسة متصفح.
+      **قرار: لا يُنشأ `content/site.json`.** آلية الحقن اليدوي في
+      `build.py` تعمل لكن استعمالها الآن يضع بيكونين ⇒ احتساب مزدوج.
+      تبقى للحالة الوحيدة التي تبرّرها: خروج الموقع من بروكسي Cloudflare.
+
+- [x] **www.awraqna.com** (2026-09-10) — أُضيف كـ Custom domain على
+      `awraqna-site`، سجلّ `CNAME www → awraqna-site.pages.dev`.
+      مُتحقَّق: DNS يحلّ إلى `188.114.96.2 / .97.2`، و HTTPS **200**،
+      و`canonical` في نسخة www يشير إلى الأصل بلا www في `/` و
+      `/worksheets/` و`/articles/` ⇒ **لا ازدواج في الفهرس**.
+
+- [ ] **Search Console** — خاصية `awraqna.com` (Domain) **مُنشأة وغير
+      مُتحقَّقة**. `START VERIFICATION` يفتح نافذة موافقة Cloudflare كـ
+      **popup خارج مجموعة تبويبات الوكيل** ⇒ هذه الخطوة بعينها غير قابلة
+      للأتمتة، ينفّذها صاحب المشروع بثلاث ضغطات. ثم رفع `sitemap.xml`
+      وطلب فهرسة `/` و`/worksheets/` و`/articles/`.
 - [x] **M27** — نظام المقالات (2026-09-10).
       • `content/articles.json` + `article_html` / `articles_index_html`.
         `Article` (datePublished · wordCount · author) + `BreadcrumbList`،
