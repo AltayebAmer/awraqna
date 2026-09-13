@@ -144,12 +144,26 @@ html[lang=en] .block-en{display:block}
 
 
 /* ---------- مشاريع أخرى ---------- */
-.foot-works{max-width:760px;margin:0 auto 20px;display:flex;flex-wrap:wrap;gap:22px;justify-content:center}
-.fw-grp h4{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--gold-2);margin-bottom:9px;text-align:center}
-.fw-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.fw-row a{display:flex;flex-direction:column;gap:2px;align-items:center;min-width:126px;
-  border:1px solid var(--line-2);border-radius:12px;padding:10px 14px;transition:.18s}
-.fw-row a:hover{border-color:var(--gold);background:var(--gold-soft)}
-.fw-row b{font-size:13px;font-weight:800;color:var(--gold-2)}
-.fw-row span{font-size:11.5px;color:var(--txt-mute)}
+
+/* شريط المشاريع — يجلس فوق الفووتر ولا يكون جزءاً منه */
+.works-band{max-width:var(--maxw);margin:58px auto 0;padding:0 20px}
+.wb-head{text-align:center;margin-bottom:20px}
+.wb-eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--txt-mute)}
+.wb-title{font-size:clamp(19px,3.4vw,26px);font-weight:800;color:var(--gold-2);margin-top:6px}
+.wb-panel{border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:22px 18px;max-width:780px;margin-inline:auto}
+.wb-h{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);text-align:center;margin:0}
+.wb-note{font-size:12.5px;line-height:1.9;color:var(--txt-mute);text-align:center;max-width:48ch;margin:8px auto 15px}
+.wb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.wb-grid a{display:flex;flex-direction:column;gap:3px;align-items:center;text-align:center;padding:14px 12px;
+  border:1px solid var(--line-2);border-radius:var(--radius-sm);text-decoration:none;transition:border-color .2s,background .2s}
+.wb-grid a:hover{border-color:var(--gold);background:var(--gold-soft)}
+.wb-grid b{font-size:14px;font-weight:800;color:var(--gold-2)}
+.wb-grid span{font-size:11.5px;color:var(--txt-mute)}
+.wb-sep{height:1px;max-width:170px;margin:20px auto;background:linear-gradient(90deg,transparent,var(--line-2),transparent)}
+.wb-art{background:rgba(207,214,234,.035);border-color:rgba(207,214,234,.16)}
+.wb-art .wb-h{color:#cfd6ea}
+.wb-art .wb-grid{max-width:290px;margin-inline:auto}
+.wb-art .wb-grid a{border-color:rgba(207,214,234,.2)}
+.wb-art .wb-grid a:hover{border-color:#cfd6ea;background:rgba(207,214,234,.07)}
+.wb-art .wb-grid b{color:#e6ebf7}
+@media(max-width:480px){.works-band{margin-top:40px}.wb-panel{padding:18px 14px}}
