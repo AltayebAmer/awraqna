@@ -134,3 +134,10 @@ html[lang=en] .block-en{display:block}
   input[type=color]{min-height:38px}
   .nav{height:60px}
 }
+
+
+/* ---------- رد المعروف ---------- */
+.foot-support{max-width:640px;margin:0 auto 22px;text-align:center;
+  background:var(--gold-soft);border:1px solid rgba(212,175,55,.22);border-radius:16px;padding:18px 20px}
+.foot-support h3{font-size:15px;font-weight:800;color:var(--gold-2);margin-bottom:8px}
+.foot-support p{color:var(--txt-dim);font-size:13.5px;line-height:1.9;margin:0}

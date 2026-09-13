@@ -50,6 +50,33 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"تواصل معنا","description":"أبلغ عن خطأ في ورقة، أو اقترح مهارة أو أداة جديدة، أو تواصل بخصوص الحقوق والتعاون.","url":"https://awraqna.com/contact/","inLanguage":"ar","isPartOf":{"@type":"WebSite","name":"أوراقنا","url":"https://awraqna.com/"},"publisher":{"@type":"Person","name":"Artist Altayeb Amer","alternateName":"الفنان الطيب عامر"}}</script>
 <link rel="stylesheet" href="/assets/brand.css">
 <link rel="stylesheet" href="/assets/page.css">
+<style>
+  /* نموذج التواصل — يُرسل عبر contact.007.gallery */
+  .contact-open{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:block}
+  .contact-open[aria-expanded=true]{border-color:var(--gold)}
+  .contact-mail{display:block;color:var(--gold-2);font-weight:800;margin-top:4px}
+  .contact-hint{display:block;margin-top:9px;font-size:12.5px;color:var(--txt-mute);font-weight:700}
+  .contact-open[aria-expanded=true] .contact-hint{color:var(--gold-2)}
+  .mailpanel{margin:18px 0 0;background:var(--bg-2);border:1px solid var(--line-2);border-radius:18px;padding:26px 22px}
+  .fld{margin-bottom:20px}
+  .fld label{display:block;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold-2);margin-bottom:9px}
+  .fld input,.fld textarea{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line-2);
+    color:var(--txt);font:inherit;font-size:15.5px;padding:9px 2px;transition:border-color .15s}
+  .fld textarea{min-height:120px;resize:vertical;line-height:1.9}
+  .fld input:focus,.fld textarea:focus{outline:none;border-bottom-color:var(--gold)}
+  .fld ::placeholder{color:var(--txt-mute);font-style:italic}
+  .trap{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;
+    overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+  #mailSend{width:100%;justify-content:center;font-weight:900}
+  .mailnote{margin-top:16px;font-size:13.5px;line-height:1.85;padding:13px 15px;border-radius:12px;border:1px solid var(--line)}
+  .mailnote[data-kind=ok]{color:#37d49a;border-color:rgba(55,212,154,.4)}
+  .mailnote[data-kind=err]{color:#ff8f8f;border-color:rgba(255,143,143,.35)}
+  .mailnote[data-kind=wait]{color:var(--txt-dim)}
+  .privacy-line{margin-top:14px;font-size:12.5px;color:var(--txt-mute)}
+</style>
+<script src="/assets/contact.js" defer></script>
 </head>
 <body>
 
@@ -70,13 +97,44 @@
   </div>
   <article class="prose">
     <p>الموقع يُبنى بناءً على ما يطلبه المعلّمون والأهل فعلاً. كل رسالة تُقرأ.</p>
-    <div class="contact-card"><span class="contact-label">البريد الإلكتروني</span><a class="contact-mail" href="mailto:artist.and.love@gmail.com">artist.and.love@gmail.com</a></div>
+    <button type="button" class="contact-card contact-open" id="mailCard" aria-expanded="false" aria-controls="mailPanel">
+      <span class="contact-label">البريد الإلكتروني</span>
+      <span class="contact-mail">hello@007.gallery</span>
+      <span class="contact-hint">اضغط لكتابة رسالتك هنا ▾</span>
+    </button>
+
+    <section class="mailpanel" id="mailPanel" hidden>
+      <form id="mailForm" novalidate>
+        <div class="fld">
+          <label for="mailEmail">بريدك الإلكتروني</label>
+          <input id="mailEmail" name="email" type="email" inputmode="email" autocomplete="email"
+                 required maxlength="254" placeholder="your@email.com" dir="ltr">
+        </div>
+        <div class="fld">
+          <label for="mailSubject">الموضوع</label>
+          <input id="mailSubject" name="subject" type="text" required maxlength="200"
+                 placeholder="خطأ في ورقة · مهارة ناقصة · تعاون…">
+        </div>
+        <div class="fld">
+          <label for="mailMessage">الرسالة</label>
+          <textarea id="mailMessage" name="message" required maxlength="5000"
+                    placeholder="اذكر الرقم المرجعي للورقة إن كان بلاغاً…"></textarea>
+        </div>
+        <div class="trap" aria-hidden="true">
+          <label for="mailTrap">Leave this field empty</label>
+          <input id="mailTrap" name="_trap" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <button class="btn btn-primary btn-lg" id="mailSend" type="submit">إرسال الرسالة</button>
+        <p class="mailnote" id="mailNote" hidden></p>
+        <p class="privacy-line">لا نحتفظ ببريدك ولا نشاركه — نستخدمه للرد عليك وحده.</p>
+      </form>
+    </section>
     <h2>ما الذي يفيدنا سماعه</h2>
     <ul><li><strong>خطأ في ورقة</strong> — أرفق الرقم المرجعي المطبوع أسفل الورقة، فهو يعيد إنتاج نفس الورقة بالضبط عندنا.</li><li><strong>مهارة ناقصة</strong> — مهارة أو صف أو نوع ورقة تحتاجه ولا تجده.</li><li><strong>مشكلة في الطباعة</strong> — اذكر المتصفح ونظام التشغيل ومقاس الورق.</li><li><strong>تعاون أو حقوق</strong> — لأي استخدام خارج <a href="/terms/">شروط الاستخدام</a>.</li></ul>
     <h2>الرقم المرجعي للورقة</h2>
     <p>أسفل كل ورقة رقم مرجعي. أرسله مع بلاغك، فيمكننا استرجاع الورقة نفسها بأسئلتها نفسها ومعاينة الخطأ مباشرةً بدل تخمينه.</p>
     <h2>المشاريع الأخرى</h2>
-    <p><a dir="ltr" href="https://007.gallery" target="_blank" rel="noopener">007.gallery</a> — أدوات صور مجانية تعمل في المتصفح.<br><a href="https://midad.gallery" target="_blank" rel="noopener">مِداد</a> — فن الخط العربي.</p>
+    <p><a dir="ltr" href="https://007.gallery" target="_blank" rel="noopener">007.gallery</a> — أدوات صور مجانية تعمل في المتصفح.</p>
   </article>
 </main>
 
@@ -95,6 +153,15 @@
       <span data-ar>أوراقنا · يعمل كلياً في متصفحك — لا يُرفع شيء إلى أي خادم.</span>
       <span data-en>Awraqna · Runs entirely in your browser — nothing is uploaded.</span>
     </p>
+    <!-- support:begin -->
+    <section class="foot-support">
+      <h3><span data-ar>❤ ادعمنا — «رد المعروف»</span><span data-en>❤ Support us — pay it forward</span></h3>
+      <p>
+        <span data-ar>أوراقنا مجانية بالكامل وتُولَّد داخل متصفحك بلا تكلفة عليك. مشاهدة إعلان بسيط، أو مشاركة الموقع مع معلّم أو والد، تساعدنا على إبقاء كل شيء مجانياً.</span>
+        <span data-en>Awraqna is completely free and generated inside your browser at no cost to you. Viewing a simple ad, or sharing the site with a teacher or parent, helps us keep everything free.</span>
+      </p>
+    </section>
+    <!-- support:end -->
     <p class="foot-copy">
       <span data-ar>© ٢٠٢٦ الفنان الطيب عامر</span>
       <span data-en>© 2026 Artist Altayeb Amer</span>
