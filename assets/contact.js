@@ -7,7 +7,7 @@
   ════════════════════════════════════════════════════════════
 
   البطاقة تنسدل فتكشف النموذج في نفس الصفحة — لا يُفتح تطبيق بريد
-  ولا يُغادر الزائر الموقع. العنوان المعروض hello@007.gallery فقط؛
+  ولا يُغادر الزائر الموقع. العنوان المعروض info@awraqna.com فقط؛
   عنوان الاستلام الحقيقي لا يوجد في أي ملف يُنزّله المتصفح.
 */
 (function (global) {
@@ -30,8 +30,8 @@
                     "That message is too long. Please shorten it a little."],
     offline:   ["تعذّر الاتصال. تحقّق من الإنترنت وأعد المحاولة.",
                 "Could not connect. Check your connection and try again."],
-    failed:    ["تعذّر الإرسال الآن. راسلنا على hello@007.gallery مباشرةً.",
-                "Sending failed right now. Please email hello@007.gallery directly."]
+    failed:    ["تعذّر الإرسال الآن. راسلنا على info@awraqna.com مباشرةً.",
+                "Sending failed right now. Please email info@awraqna.com directly."]
   };
 
   /* تُطابق قواعد الـWorker. الخادم يبقى الحكم، وهذا يوفّر على الزائر
