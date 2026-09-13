@@ -36,24 +36,12 @@
       body_en:"Your lunar age, date conversion, and the Moon of the night you were born.",
       cta_ar:"احسب الآن", cta_en:"Calculate now",
       c1:"#07071A", c2:"#2b2352", accent:"#e8c97a" },
-    { id:"kashf", url:"#", badge:"كشف",
-      title_ar:"كشف — تحليل ذكي للبيانات", title_en:"Kashf — Smart Data Insight",
-      body_ar:"حوّل بياناتك إلى قرارات واضحة بالذكاء الاصطناعي.",
-      body_en:"Turn your data into clear decisions with AI.",
-      cta_ar:"جرّب مجاناً", cta_en:"Try free",
-      c1:"#0d2a24", c2:"#12503f", accent:"#4fe0b0" },
     { id:"quran", url:"https://qurankarem.org", badge:"القرآن الكريم",
       title_ar:"مصحف رقمي بتجربة صافية", title_en:"A Clean Digital Quran",
       body_ar:"قراءة مريحة بلا إعلانات ولا تشتيت.",
       body_en:"Comfortable reading — no ads, no distractions.",
       cta_ar:"افتح المصحف", cta_en:"Open now",
-      c1:"#2a2410", c2:"#5c4a15", accent:"#f0d264" },
-    { id:"seven", url:"#", badge:"The Seven Council",
-      title_ar:"منصّة ذكاء المشاريع", title_en:"Project Intelligence Platform",
-      body_ar:"سبعة عقول تحلّل مشروعك من كل زاوية.",
-      body_en:"Seven minds analyzing your project from every angle.",
-      cta_ar:"تعرّف أكثر", cta_en:"Learn more",
-      c1:"#101a2e", c2:"#1e3a63", accent:"#79b8ff" },
+      c1:"#2a2410", c2:"#5c4a15", accent:"#f0d264" }
   ];
 
   const T = () => document.documentElement.getAttribute("lang") === "en";
